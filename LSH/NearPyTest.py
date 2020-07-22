@@ -54,6 +54,7 @@ n_test = 0
 for images, labels in test_loader:
     q = images.view(-1, 28 * 28)[0].numpy()
     N = engine.neighbours(q)
+    n_test += 1
 
 test_end = time.time()
 test_time = test_end - test_start
