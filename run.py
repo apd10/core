@@ -16,6 +16,7 @@ cur_dir = dirname(abspath(__file__))
 import yaml
 from main_modules.Loop import *
 from main_modules.RaceSketch import *
+from main_modules.DataWriter import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--config', action="store", dest="config", type=str, default=None, required=True,
@@ -31,3 +32,6 @@ if config['module'] == "Loop":
 elif config["module"] == "RaceSketch":
   run = RaceSketch(config)
   run.sketch()
+elif config["module"] == "DataWriter":
+  run = DataWriter(config)
+  run.loop()

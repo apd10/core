@@ -34,3 +34,19 @@ class SRP():
     dic["d"] =self.d
     dic["W"] = self.W
     return dic
+
+  def set_dictionary(self, dic):
+    self.N = dic["N"]
+    self.d = dic["d"]
+    self.W = dic["W"]
+
+  def get_equations(self, hashvalues, rep, chunk_size):
+    assert(chunk_size == len(hashvalues)) # remove chunk_size
+    W_heq = np.copy(self.W.transpose()[rep*chunk_size:(rep+1)*chunk_size,:]) # W_heq : N x d 
+    b_heq = np.zeros(chunk_size)
+    for i in range(chunk_size):
+      if hashvalues[i] == 1:
+          W_heq[i, :] = W_heq[i, :] * -1
+    return W_heq, b_heq
+    
+  

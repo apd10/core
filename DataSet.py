@@ -9,6 +9,8 @@ class DataSet:
           dataset = GenSVMFormatParser(data_file, params)
         elif name == "csv":
           dataset = CSVParser(data_file, params)
+        elif name == "race":
+          dataset = RaceSampler(data_file, params)
         else:
           raise NotImplementedError
         return dataset

@@ -1,0 +1,25 @@
+module: "RaceSketch"
+data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/simulated/data.txt"
+  dataset: "csv"
+  csv:
+    sep: " "
+    header: "infer"
+    label_header: "label"
+  sampler: "simple"
+  simple:
+    batch_size: 500
+save_sketch: "/home/apd10/experiments/projects/summary_based_learning/DATA/simulated/race_train.pickle"
+np_seed: 101
+race:
+  range: 1050000
+  repetitions: 10
+  power: 20
+  num_classes: 4
+  rehash: False
+  max_coord: 1
+  min_coord: -1
+  lsh_function:
+    name: "srp"
+    srp:
+      dimension: 2

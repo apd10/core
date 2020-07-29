@@ -1,0 +1,11 @@
+module: "DataWriter"
+epochs: 1
+train_data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/FashionMnist/race_train.pickle"
+  dataset: "race"
+  race:
+    epoch_samples: 60000
+  sampler: "simple"
+  simple:
+    batch_size: 10
+write_data_file: "/home/apd10/experiments/projects/summary_based_learning/DATA/FashionMnist/race_train_srp_sampled.txt"

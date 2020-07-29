@@ -18,6 +18,8 @@ race:
   power: 20
   num_classes: 10
   rehash: False
+  max_coord: 1
+  min_coord: 0
   lsh_function:
     name: "srp"
     srp:

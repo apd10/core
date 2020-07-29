@@ -1,0 +1,25 @@
+module: "RaceSketch"
+data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist/data/train.txt"
+  dataset: "gensvm"
+  gensvm:
+    dimension: 784
+  sampler: "simple"
+  simple:
+    batch_size: 500
+save_sketch: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist/data/race_train_l2lsh.pickle"
+np_seed: 101
+race:
+  range: 3300000 # (2*max_norm / bandwidth + 1)*power
+  repetitions: 5
+  power: 3
+  num_classes: 10
+  rehash: False
+  max_coord: 1
+  min_coord: 0
+  lsh_function:
+    name: "l2lsh"
+    l2lsh:
+      bandwidth: 0.5
+      dimension: 784
+      max_norm: 2
