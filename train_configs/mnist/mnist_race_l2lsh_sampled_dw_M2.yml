@@ -1,0 +1,19 @@
+module: "DataWriter"
+epochs: 1
+train_data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist/data/race_train_l2lsh_m2.pickle"
+  dataset: "race"
+  race:
+    epoch_samples: 10000
+    method: "m2"
+    m2:
+      num_rep: 500
+      minover:
+        max_iters: 100
+        speed: 1
+  
+  sampler: "simple"
+  simple:
+    batch_size: 2
+
+write_data_file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist/data/race_train_l2lsh_sampled_M2.txt"

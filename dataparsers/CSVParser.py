@@ -8,7 +8,9 @@ class CSVParser(data.Dataset):
     def __init__(self, X_file, params):
         super(CSVParser, self).__init__()
         self.sep = params["sep"]
-        self.header = params["header"]
+        self.header = None
+        if "header" in params:
+            self.header = params["header"]
         self.X = pd.read_csv(X_file, sep=self.sep, header=self.header)
         self.label_header = params["label_header"]
         self.labels =  self.X[self.label_header]

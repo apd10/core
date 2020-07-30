@@ -20,6 +20,7 @@ class Race():
     self.offset_arr = np.power(self.range_hf, np.arange(self.power))
 
     if not self.rehash: # rehashing is not allowed. so the actual value shoud be within range
+        print(self.range_hf,self.power,"||",(self.range_hf)**self.power,"<=",self.range)
         assert((self.range_hf)**self.power <= self.range)
 
   def decode(self, bucket):
@@ -62,6 +63,19 @@ class Race():
     race_sketch["hashfunction"] = self.hashfunction.get_dictionary()
     race_sketch["params"] = self.params
     return race_sketch
+
+  def get_hf_equations(self, hash_values, rep, chunk_size):
+    W_heq, b_heq = self.hashfunction.get_equations(hash_values, rep, chunk_size)
+    return W_heq, b_heq
+
+  def get_bounding_equations(self):
+    W_max = np.identity(self.hashfunction.d)
+    b_max = np.ones(self.hashfunction.d) * self.max_coord
+    W_min = np.identity(self.hashfunction.d) * -1
+    b_min = np.ones(self.hashfunction.d) * self.min_coord * -1
+    W_total = np.concatenate([W_max, W_min])
+    b_total = np.concatenate([b_max, b_min])
+    return W_total, b_total
 
   def get_equations(self, hash_values, rep, chunk_size):
     # get hash equations

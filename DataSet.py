@@ -11,6 +11,8 @@ class DataSet:
           dataset = CSVParser(data_file, params)
         elif name == "race":
           dataset = RaceSampler(data_file, params)
+        elif name == "race_pp":
+          dataset = RaceSamplerPreProc(data_file, params)
         else:
           raise NotImplementedError
         return dataset
