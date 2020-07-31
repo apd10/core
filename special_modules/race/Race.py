@@ -1,5 +1,6 @@
 from Hash import *
 import pdb
+from scipy.sparse import csr_matrix
 
 class Race():
   def __init__(self, params):
@@ -11,17 +12,24 @@ class Race():
     self.max_coord = params["max_coord"]
     self.min_coord = params["min_coord"]
     self.hashfunction = HashFunction.get(params["lsh_function"], num_hashes=self.power * self.repetitions)
-    self.sketch_memory = np.zeros(shape=(self.num_classes, self.repetitions, self.range))
+    #self.sketch_memory = np.zeros(shape=(self.num_classes, self.repetitions, self.range))
+    self.sketch_memory = {}
+
+    for i in range(self.num_classes):
+        self.sketch_memory[i] = csr_matrix((self.repetitions, 2**32-1), dtype=np.int32)
     self.max_range_hf = self.hashfunction.get_max()
     self.min_range_hf = self.hashfunction.get_min()
     self.range_hf = self.max_range_hf - self.min_range_hf + 1 # number of values
     self.params = params
+    self.class_counts = np.zeros(self.num_classes)
 
     self.offset_arr = np.power(self.range_hf, np.arange(self.power))
 
     if not self.rehash: # rehashing is not allowed. so the actual value shoud be within range
         print(self.range_hf,self.power,"||",(self.range_hf)**self.power,"<=",self.range)
         assert((self.range_hf)**self.power <= self.range)
+
+
 
   def decode(self, bucket):
     hashvalues = np.zeros(self.power)
@@ -52,16 +60,20 @@ class Race():
       update_loc  = np.sum(hash_location_offset_ed[:,rep*self.power:(rep+1)*self.power], axis=1).astype(np.int32)
       if self.rehash:
           raise NotImplementedError
+
       for i in range(x.shape[0]):
         c = y[i]
+        self.class_counts[c] += 1
         loc = update_loc[i]
-        self.sketch_memory[c][rep][loc] += 1
+        #self.sketch_memory[c][rep][loc] += 1
+        self.sketch_memory[c] = self.sketch_memory[c] +  csr_matrix(([1], ([rep],[loc])), shape=(self.repetitions, 2**32-1), dtype=np.int32)
 
   def get_dictionary(self):
     race_sketch = {}
     race_sketch["memory"] = self.sketch_memory
     race_sketch["hashfunction"] = self.hashfunction.get_dictionary()
     race_sketch["params"] = self.params
+    race_sketch["class_counts"] = self.class_counts
     return race_sketch
 
   def get_hf_equations(self, hash_values, rep, chunk_size):
@@ -107,7 +119,7 @@ class Race():
       for i in range(x.shape[0]):
         c = y[i]
         loc = locs[i]
-        kde_estimates[i] += self.sketch_memory[c][rep][loc] / np.sum(self.sketch_memory[c][rep])
+        kde_estimates[i] += self.sketch_memory[c][rep][loc] / np.sum(self.sketch_memory[c][rep]) # to fix before use
     kde_estimates /= self.repetitions
     return kde_estimates
       

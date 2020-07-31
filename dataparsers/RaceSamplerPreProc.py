@@ -10,6 +10,7 @@ from special_modules.sampling_polytopes.hitandrun.hitandrun.hitandrun import *
 from special_modules.sampling_polytopes.hitandrun.hitandrun.minover import *
 import concurrent
 from tqdm import tqdm
+from scipy.sparse import csr_matrix
 
 global_vars = {
   "race" : None,
@@ -22,7 +23,6 @@ global_vars = {
 def sample_m1(rep, label, bucket):
     race = global_vars["race"]
     class_prob = global_vars["class_prob"]
-    sketch = race.sketch_memory[label][rep] # 1 x range  array of counts
     hash_values = race.decode(bucket)
     Weq,Beq = race.get_equations(hash_values, rep, len(hash_values))
     polytope = Polytope(A=Weq, b=Beq)
@@ -47,14 +47,19 @@ def sample_batch(num):
     with concurrent.futures.ProcessPoolExecutor(25) as executor:
         futures = []
         print("submitting jobs")
+
         for i in tqdm(range(num)):
             label = np.argmax(np.random.multinomial(1, class_prob, size=None))
             rep = np.random.randint(0, race.repetitions)
-            sketch = race.sketch_memory[label][rep] # 1 x range  array of counts
-            bucket = np.argmax(np.random.multinomial(1, sketch/np.sum(sketch), size=None))
+            sketch = race.sketch_memory[label] # 1 x range  array of counts
+
+            sketch_data = sketch.data[sketch.indptr[rep]:sketch.indptr[rep+1]]
+            sketch_cols = sketch.indices[sketch.indptr[rep]:sketch.indptr[rep+1]]
+            bucket_idx = np.argmax(np.random.multinomial(1, sketch_data/np.sum(sketch_data), size=None))
+            bucket = sketch_cols[bucket_idx]
             futures.append(executor.submit(sample_m1, rep, label, bucket))
         print("waiting for executions")
-        for res in tqdm(concurrent.futures.as_completed(futures), total=num) :
+        for res in tqdm(concurrent.futures.as_completed(futures), total=num):
           d = res.result()
           data.append(d)
     return data
@@ -72,11 +77,10 @@ class RaceSamplerPreProc(data.Dataset):
         self.race = Race(self.race_pickle["params"])
         self.race.sketch_memory = self.race_pickle["memory"]
         self.race.hashfunction.set_dictionary(self.race_pickle["hashfunction"])
+        self.race.class_counts = self.race_pickle["class_counts"]
         # computing class probabilities
-        class_counts = np.zeros(self.race.num_classes)
-        for c in np.arange(self.race.num_classes):
-          class_counts[c] = np.sum(self.race.sketch_memory[c][0])
-        self.class_prob = class_counts / np.sum(class_counts)
+
+        self.class_prob = self.race.class_counts / np.sum(self.race.class_counts)
         self.method_params = params[params["method"]]
 
         #set global vars
