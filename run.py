@@ -14,7 +14,9 @@ from os.path import dirname, abspath, join
 import glob
 cur_dir = dirname(abspath(__file__))
 import yaml
-from Loop import *
+from main_modules.Loop import *
+from main_modules.RaceSketch import *
+from main_modules.DataWriter import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--config', action="store", dest="config", type=str, default=None, required=True,
@@ -24,5 +26,12 @@ results = parser.parse_args()
 config_file = results.config
 with open(config_file, "r") as f:
   config = yaml.load(f)
-run = Loop(config)
-run.loop()
+if config['module'] == "Loop":
+  run = Loop(config)
+  run.loop()
+elif config["module"] == "RaceSketch":
+  run = RaceSketch(config)
+  run.sketch()
+elif config["module"] == "DataWriter":
+  run = DataWriter(config)
+  run.loop()

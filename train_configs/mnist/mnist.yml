@@ -1,3 +1,4 @@
+module: "Loop"
 device_id: 6
 epochs: 10
 train_data:

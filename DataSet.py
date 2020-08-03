@@ -7,6 +7,12 @@ class DataSet:
     def get(data_file, name, params):
         if name == "gensvm":
           dataset = GenSVMFormatParser(data_file, params)
+        elif name == "csv":
+          dataset = CSVParser(data_file, params)
+        elif name == "race":
+          dataset = RaceSampler(data_file, params)
+        elif name == "race_pp":
+          dataset = RaceSamplerPreProc(data_file, params)
         else:
           raise NotImplementedError
         return dataset
