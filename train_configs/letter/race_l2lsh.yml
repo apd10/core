@@ -14,7 +14,7 @@ np_seed: 101
 race:
   range: 4294967295 # (2*max_norm / bandwidth + 1)*power
   power: 5
-  repetitions: 1
+  repetitions: 50
   num_classes: 26
   rehash: False
   max_coord: 1

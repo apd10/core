@@ -46,6 +46,7 @@ def sample_batch(num):
     race = global_vars["race"]
     class_prob = global_vars["class_prob"]
     data = []
+    labels = []
     with concurrent.futures.ProcessPoolExecutor(25) as executor:
         futures = []
         print("submitting jobs")
@@ -64,8 +65,9 @@ def sample_batch(num):
         for res in tqdm(concurrent.futures.as_completed(futures), total=num):
           d = res.result()
           if d is not None:
-              data.append(d)
-    return data
+              data.append(d[0])
+              labels.append(d[1])
+    return np.array(data),np.array(labels)
 
 
 class RaceSamplerPreProc(data.Dataset):
@@ -92,18 +94,25 @@ class RaceSamplerPreProc(data.Dataset):
         global_vars["max_iters"] = self.method_params["minover"]["max_iters"]
         global_vars["speed"] = self.method_params["minover"]["speed"]
 
-        self.Data = []
+        self.Data = None
+        self.labels = None
     
         
     def __len__(self):
         return self.length
 
     def __getitem__(self, index):
-        if index + 1 > len(self.Data):
-            d = sample_batch(self.parallel_batch)
-            self.Data = self.Data + d
+        if self.Data is None or index + 1 > self.Data.shape[0]:
+            data,labels = sample_batch(self.parallel_batch)
+            if self.Data is None:
+                self.Data = data
+                self.labels = labels
+            else:
+                self.Data = np.concatenate([self.Data, data], axis=0)
+                self.labels = np.concatenate([self.labels, labels], axis=0)
+              
             
-        return self.Data[index]
+        return self.Data[index],self.labels[index]
         
 
         

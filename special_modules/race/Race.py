@@ -119,8 +119,7 @@ class Race():
       for i in range(x.shape[0]):
         c = y[i]
         loc = locs[i]
-        kde_estimates[i] += self.sketch_memory[c][rep][loc] / np.sum(self.sketch_memory[c][rep]) # to fix before use
+        #kde_estimates[i] += self.sketch_memory[c][rep][loc] / np.sum(self.sketch_memory[c][rep]) # to fix before use
+        kde_estimates[i] += self.sketch_memory[c][rep, loc] #/ self.class_counts[c]  # commenting because it is easier to interpret
     kde_estimates /= self.repetitions
     return kde_estimates
-      
-
