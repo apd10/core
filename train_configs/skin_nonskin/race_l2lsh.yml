@@ -1,0 +1,27 @@
+module: "RaceSketch"
+data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/skin_nonskin.dt/train.txt"
+  dataset: "csv"
+  csv:
+    sep: " "
+    label_header: 0
+    normalizer_const: 255
+  sampler: "simple"
+  simple:
+    batch_size: 20000
+save_sketch: "/home/apd10/experiments/projects/summary_based_learning/DATA/skin_nonskin.dt/race_sketch.pickle"
+np_seed: 101
+race:
+  range: 4294967295 # (2*max_norm / bandwidth + 1)*power
+  power: 6
+  repetitions: 1
+  num_classes: 2
+  rehash: False
+  max_coord: 1
+  min_coord: 0
+  lsh_function:
+    name: "l2lsh"
+    l2lsh:
+      bandwidth: 0.1
+      dimension: 3
+      max_norm: 1.5

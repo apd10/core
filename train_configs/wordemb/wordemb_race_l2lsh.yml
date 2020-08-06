@@ -1,0 +1,28 @@
+module: "RaceSketch"
+data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/wordemb/model.txt"
+  dataset: "csv"
+  csv:
+    sep: " "
+    label_header: 0
+    ignore_label: True
+    skiprows : 1
+  sampler: "simple"
+  simple:
+    batch_size: 5000
+save_sketch: "/home/apd10/experiments/projects/summary_based_learning/DATA/wordemb/race_sketch.pickle"
+np_seed: 101
+race:
+  range: 4294967295 # (2*max_norm / bandwidth + 1)*power
+  power: 1
+  repetitions: 1
+  num_classes: 1
+  rehash: False
+  max_coord: 0.33
+  min_coord: -0.33
+  lsh_function:
+    name: "l2lsh"
+    l2lsh:
+      bandwidth: 0.00000001
+      dimension: 300
+      max_norm: 1

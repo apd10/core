@@ -11,12 +11,24 @@ class CSVParser(data.Dataset):
         self.header = None
         if "header" in params:
             self.header = params["header"]
-        self.X = pd.read_csv(X_file, sep=self.sep, header=self.header)
-        self.label_header = params["label_header"]
-        self.labels =  self.X[self.label_header]
+        self.skiprows = None
+        if "skiprows" in params:
+            self.skiprows = params["skiprows"]
+        self.X = pd.read_csv(X_file, sep=self.sep, header=self.header, skiprows=self.skiprows)
+
+        self.label_header = None
+        if "label_header" in params:
+            self.label_header = params["label_header"]
+            self.labels =  self.X[self.label_header]
+            del self.X[self.label_header]
+        else:
+            self.labels = np.zeros(self.X.shape[0])
+
+        if "ignore_label" in params:
+            self.labels = np.zeros(self.X.shape[0])
+
         if "normalizer_const" in params:
             self.X = self.X / params["normalizer_const"]
-        del self.X[self.label_header]
 
         self.length = self.X.shape[0]
         self.dimension = self.X.shape[1]

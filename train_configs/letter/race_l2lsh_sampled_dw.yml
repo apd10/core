@@ -1,0 +1,17 @@
+module: "DataWriter"
+epochs: 1
+train_data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/letter/race_sketch.pickle"
+  dataset: "race_pp"
+  race_pp:
+    epoch_samples: 20000
+    parallel_batch: 2000
+    method: "m1"
+    m1:
+      minover:
+        max_iters: 500
+        speed: 0.1
+  sampler: "simple"
+  simple:
+    batch_size: 2000
+write_data_file: "/home/apd10/experiments/projects/summary_based_learning/DATA/letter/race_train_l2lsh_sampled.txt"

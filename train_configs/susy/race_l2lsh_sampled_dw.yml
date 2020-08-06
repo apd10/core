@@ -1,0 +1,17 @@
+module: "DataWriter"
+epochs: 1
+train_data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/SUSY/race_sketch.pickle"
+  dataset: "race_pp"
+  race_pp:
+    epoch_samples: 1000000
+    parallel_batch: 20000
+    method: "m1"
+    m1:
+      minover:
+        max_iters: 1000
+        speed: 0.1
+  sampler: "simple"
+  simple:
+    batch_size: 2000
+write_data_file: "/home/apd10/experiments/projects/summary_based_learning/DATA/SUSY/race_train_l2lsh_sampled.txt"

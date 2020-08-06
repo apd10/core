@@ -30,9 +30,11 @@ def sample_m1(rep, label, bucket):
     # getting a point inside the polytope
     x_random = np.zeros(Weq.shape[1]) # if its SRP then 0 is already in the polygon!
     minover = MinOver(polytope=polytope)
-    point, convergence = minover.run(starting_point=x_random, max_iters=global_vars["max_iters"], speed=global_vars["speed"])
+    for i in range(10):
+      point, convergence = minover.run(starting_point=x_random, max_iters=global_vars["max_iters"], speed=global_vars["speed"])
+      if convergence:
+        break;
 
-    assert(convergence)
     if not convergence:
         return None
     assert(polytope.check_inside(point))
@@ -61,7 +63,8 @@ def sample_batch(num):
         print("waiting for executions")
         for res in tqdm(concurrent.futures.as_completed(futures), total=num):
           d = res.result()
-          data.append(d)
+          if d is not None:
+              data.append(d)
     return data
 
 
