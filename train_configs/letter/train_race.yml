@@ -1,6 +1,6 @@
 module: "Loop"
-device_id: 6
-epochs: 20
+device_id: 0
+epochs: 100
 train_data:
   file: "/home/apd10/experiments/projects/summary_based_learning/DATA/letter/race_train_l2lsh_sampled.txt"
   dataset: "csv"
