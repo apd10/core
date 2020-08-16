@@ -6,7 +6,6 @@ train_data:
   race_pp:
     epoch_samples: 30000
     parallel_batch: 5000
-    kde_lb: 0.08
     method: "m1"
     m1:
       minover:

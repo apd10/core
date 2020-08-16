@@ -13,7 +13,7 @@ class SimplePrintEvaluator:
 
     def evaluate(self, epoch, loc_itr, iteration, model, loss_func): # also logs
         if iteration % self.eval_itr == 0 or (epoch % self.eval_epoch == 0 and loc_itr == 0):
-            self._eval(epoch, loc_itr, iteration, model, loss_func, self.train_data, "TRAIN")
+            #self._eval(epoch, loc_itr, iteration, model, loss_func, self.train_data, "TRAIN")
             self._eval(epoch, loc_itr, iteration, model, loss_func, self.test_data, "TEST")
 
     def _eval(self, epoch, loc_itr, iteration, model, loss_func, data, key):

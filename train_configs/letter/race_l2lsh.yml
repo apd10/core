@@ -8,13 +8,13 @@ data:
     class_base_idx: 1
   sampler: "simple"
   simple:
-    batch_size: 20000
+    batch_size: 10000
 save_sketch: "/home/apd10/experiments/projects/summary_based_learning/DATA/letter/race_sketch.pickle"
 np_seed: 101
 race:
   range: 4294967295 # (2*max_norm / bandwidth + 1)*power
   power: 5
-  repetitions: 50
+  repetitions: 1
   num_classes: 26
   rehash: False
   max_coord: 1
