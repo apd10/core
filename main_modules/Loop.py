@@ -38,8 +38,13 @@ class Loop:
 
         while epoch < self.epochs :
             self.train_data.reset()
+            num_samples = self.train_data.len()
+            batch_size = self.train_data.batch_size()
+            num_batches = int(np.ceil(num_samples/batch_size))
             loc_itr = 0
-            while not self.train_data.end():
+            for i in tqdm(range(num_batches)):
+                if self.train_data.end():
+                  break
                 self.model.train()
                 self.optimizer.zero_grad()
                 x, y = self.train_data.next()

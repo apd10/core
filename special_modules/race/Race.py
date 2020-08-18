@@ -4,7 +4,7 @@ from scipy.sparse import csr_matrix
 
 # DONT USE NUMPY. JUST USE TORCH
 
-class Race():
+class Race:
   def __init__(self, params):
     self.range = params["range"]
     self.repetitions = params["repetitions"]
