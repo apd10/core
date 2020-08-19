@@ -1,0 +1,68 @@
+module: "Loop"
+device_id: 2
+epochs: 1
+train_data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist8m//train.txt"
+  dataset: "gensvm"
+  gensvm:
+    dimension: 784
+    base_idx: 1
+  sampler: "simple"
+  simple:
+    batch_size: 512
+test_data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist8m//test.txt"
+  dataset: "gensvm"
+  gensvm:
+    dimension: 784
+    base_idx: 1
+  sampler: "simple"
+  simple:
+    batch_size: 1000
+validation_data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist8m//test_small.txt"
+  dataset: "gensvm"
+  gensvm:
+    dimension: 784
+    base_idx: 1
+  sampler: "simple"
+  simple:
+    batch_size: 1000
+progress_train_data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist8m//train_small.txt"
+  dataset: "gensvm"
+  gensvm:
+    dimension: 784
+    base_idx: 1
+  sampler: "simple"
+  simple:
+    batch_size: 1000
+progress_test_data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist8m//test_small.txt"
+  dataset: "gensvm"
+  gensvm:
+    dimension: 784
+    base_idx: 1
+
+  sampler: "simple"
+  simple:
+    batch_size: 1000
+model:
+  name: "MLP"
+  MLP:
+    input_dim: 784
+    num_layers: 3
+    hidden_size: 100
+    num_class: 10
+optimizer:
+  name: "adam"
+  adam:
+    lr: 0.001
+    weight_decay: 0
+loss:
+  name: "NLL"
+progress_evaluator:
+  name: "simple_print"
+  simple_print:
+      eval_itr: 1000000
+      eval_epoch: 1

@@ -1,0 +1,36 @@
+module: "RaceGenSketch"
+data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/cifar10/train.txt"
+  dataset: "gensvm"
+  gensvm:
+    dimension: 3072
+    base_idx: 1
+    normalizer_const: 255
+  sampler: "simple"
+  simple:
+    batch_size: 5000
+save_sketch: "/home/apd10/experiments/projects/summary_based_learning/DATA/cifar10/parameter_tuning/race_sketch_gen_p500.pickle"
+np_seed: 101
+race:
+  power: 500
+  repetitions: 2
+  num_classes: 10
+  max_coord: 1
+  min_coord: 0
+  random_seed: 101
+  ace_type: "cs"
+  ace_params:
+    rep : 5
+    range : 50000
+    num_keys : 500 # equal to the power
+    device_id : -1 # to do on cpu. test device as well later
+    sketch_type : "CMS" # we only store counts
+    recovery : "min" # min recovery
+    topK : 5000 # top 1000 buckets should be good
+  lsh_function:
+    name: "l2lsh_torch"
+    l2lsh_torch:
+      bandwidth: 0.1
+      dimension: 3072
+      max_norm: 55 # this is useless
+      device_id: -1

@@ -17,6 +17,11 @@ class GenSVMFormatParser(data.Dataset):
         self.class_base_idx = 0
         if "class_base_idx" in params:
             self.class_base_idx = params["class_base_idx"]
+        self.normalizer_const = 1
+        if "normalizer_const" in params:
+            self.normalizer_const = params["normalizer_const"]
+
+
     def __len__(self):
         return self.length
     def __getitem__(self, index):
@@ -28,6 +33,6 @@ class GenSVMFormatParser(data.Dataset):
 
         for xd in xdata:
             temp = xd.split(":")
-            data_point[int(temp[0]) - self.base_idx] = float(temp[1])
+            data_point[int(temp[0]) - self.base_idx] = float(temp[1]) / self.normalizer_const
         return data_point, label
 
