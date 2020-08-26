@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+from numpy.linalg import norm
 from torchvision import datasets
 import torchvision.transforms as transforms
 import torch.nn as nn
@@ -9,14 +10,14 @@ from nearpy.filters import NearestFilter
 from nearpy.hashes import RandomBinaryProjections
 from nearpy.storage import MemoryStorage
 import time
-
+from skopt import gp_minimize
 
 
 # LOAD DATA
 # number of subprocesses to use for data loading
 num_workers = 0
 # how many samples per batch to load
-batch_size = 5
+batch_size = 1
 
 # convert data to torch.FloatTensor
 transform = transforms.ToTensor()
@@ -35,12 +36,36 @@ test_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size,
 # data loader for hashing the training data; load single data points instead of in batches
 train_loader_lsh = torch.utils.data.DataLoader(test_data)
 
+i = 0
+
+
+def loss_grad_inv(w, x, n_classes, c):
+    classes = np.arange(n_classes)
+    classes_except_c = np.array([i for i in range(n_classes) if i != c])
+
+    def exw(i):
+        return np.exp([np.matmul(w[i].detach().numpy(), x)])
+    exw_j = np.sum(exw(classes))
+
+    def i_neq_c(i):
+        return (exw(i) / exw_j) ** 2
+    first_inner_term = np.sum(i_neq_c(classes_except_c))
+    second_inner_term = ((exw(c) / exw_j - 1) ** 2)[0]
+    loss = (norm(x) ** 2) * (first_inner_term + second_inner_term)
+    print(loss, flush=True)
+    return 1 / loss
+
+
+def optimization_domain(dim, domain):
+    print("and another c", flush=True)
+    return np.array([domain for _ in range(dim)])
+
 
 # DEFINE NETWORK ARCHITECTURE
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.fc1 = nn.Linear(28 * 28, 512)
+        self.fc1 = nn.Linear(28 * 28, 10)
         # linear layer (n_hidden -> hidden_2)
         self.fc2 = nn.Linear(512, 512)
         # linear layer (n_hidden -> 10)
@@ -72,10 +97,15 @@ rbp = [RandomBinaryProjections('rbp', K) for i in range(L)]
 # Prepare LSH table
 storage = MemoryStorage()
 engine = Engine(dimension, lshashes=rbp, storage=storage, vector_filters=[NearestFilter(100)])
+
+i = 0
 # Hash data
 for data, target in train_loader_lsh:
     v = data.view(-1, 28 * 28)[0].numpy()
+    if i == 0:
+        print(v)
     engine.store_vector(v, target)
+    i += 1
 
 ############
 # TRAINING #
@@ -88,25 +118,35 @@ for epoch in range(n_epochs):
     train_loss = 0.0
     # track batch with maximum gradient
     max_grad = 0
-    max_grad_batch = None
+    # max_grad_batch = None
 
-    # Find batch with highest gradient
-    for data, target in train_loader:
-        optimizer.zero_grad()
-        output = model(data)
-        loss = criterion(output, target)
-        loss.backward()
-        # calculate gradient and adjust max grad
-        grad = np.linalg.norm(model.fc1.weight.grad.numpy())
-        if grad > max_grad:
-            max_grad = grad
-            max_grad_batch = data
+    # # Find batch with highest gradient
+    # for data, target in train_loader:
+    #     optimizer.zero_grad()
+    #     output = model(data)
+    #     loss = criterion(output, target)
+    #     loss.backward()
+    #     # calculate gradient and adjust max grad
+    #     grad = np.linalg.norm(model.fc1.weight.grad.numpy())
+    #     if grad > max_grad:
+    #         max_grad = grad
+    #         max_grad_batch = data
+    def loss_grad_w(c):
+        return lambda x: loss_grad_inv(model.fc1.weight, x, 10, c)
 
+
+    print("getting max_grad_batch", flush=True)
+    max_grad_batch = [gp_minimize(loss_grad_w(c), optimization_domain(28 * 28, (0, 1)), n_calls=10) for c in range(10)]
+    # print(max_grad_batch, flush=True)
     # Collect neighbors of data in the batch with maximum gradient
     neighbors = []
-    for d in max_grad_batch:
-        v = d.view(-1, 28 * 28)[0].numpy()
-        neighbors.extend(engine.neighbours(v))
+    i = 0
+    for m in max_grad_batch:
+        if i == 0:
+            print(np.array(m["x"]))
+        # v = d.view(-1, 28 * 28)[0].numpy()
+        neighbors.extend(engine.neighbours(np.array(m["x"])))
+        i += 1
     print(len(neighbors))
 
     # Reformat to be compatible with data loader
