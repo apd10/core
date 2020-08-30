@@ -58,7 +58,8 @@ class RaceGen:
           examples_perclass = hash_values[y == c]
           if rep ==0: # add only once
               self.class_counts[c] += examples_perclass.shape[0]
-          self.sketch_memory[c][rep].insert(examples_perclass, torch.ones((examples_perclass.shape[0], 1)))
+          if examples_perclass.shape[0] > 0:
+              self.sketch_memory[c][rep].insert(examples_perclass, torch.ones((examples_perclass.shape[0], 1)))
 
   def get_dictionary(self):
     race_sketch = {}

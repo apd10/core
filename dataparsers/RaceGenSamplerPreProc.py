@@ -39,10 +39,22 @@ def sample_m1(rep, label, hash_values):
 
     #if not convergence:
     #    return None
-    res = scipy.optimize.linprog(c=np.zeros(Weq.shape[1]), A_ub = Weq, b_ub = Beq)
-    point = res.x
+
+    #pdb.set_trace()
+    try:
+      res = scipy.optimize.linprog(c=np.zeros(Weq.shape[1]), A_ub = Weq, b_ub = Beq)
+      point = res.x
+      if not polytope.check_inside(point):
+          x_random = np.random.random(Weq.shape[1])
+          minover = MinOver(polytope=polytope)
+          point, convergence = minover.run(starting_point=x_random, max_iters=global_vars["max_iters"], speed=global_vars["speed"])
+          if not convergence:
+              return None
+    except:
+      return None
 
     assert(polytope.check_inside(point))
+      
     hitandrun = HitAndRun(polytope=polytope, starting_point=point)
     sample = hitandrun.get_samples(n_samples=1, thin=100)
     return sample[0],label
@@ -55,6 +67,7 @@ def sample_batch(num, kde_lb):
     num_samples = 0
     Datas = []
     Labels = []
+    num_failed = 0
 
     while np.sum(class_counts) > 0 and num_samples < num:
         print("Samples", num_samples, "/", num)
@@ -83,6 +96,8 @@ def sample_batch(num, kde_lb):
               if d is not None:
                   data.append(d[0])
                   labels.append(d[1])
+              else:
+                  num_failed += 1
         data =  np.array(data)
         labels = np.array(labels)
         if kde_lb is not None:
@@ -100,6 +115,7 @@ def sample_batch(num, kde_lb):
         Labels.append(labels)
     Data = np.concatenate(Datas, axis=0)
     Label = np.concatenate(Labels, axis=0)
+    print("Num sampled", Data.shape[0], "num failed", num_failed)
     return Data, Label
         
 

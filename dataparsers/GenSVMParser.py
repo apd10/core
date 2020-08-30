@@ -21,6 +21,10 @@ class GenSVMFormatParser(data.Dataset):
         if "normalizer_const" in params:
             self.normalizer_const = params["normalizer_const"]
 
+        self.neg_class = False
+        if "neg_class" in params:
+            self.neg_class = True
+
 
     def __len__(self):
         return self.length
@@ -29,6 +33,9 @@ class GenSVMFormatParser(data.Dataset):
         data = self.X[index].strip().split(" ")
 
         label = int(data[0]) - self.class_base_idx
+        if self.neg_class and label == -1:
+            label = 0
+            
         xdata = data[1:]
 
         for xd in xdata:

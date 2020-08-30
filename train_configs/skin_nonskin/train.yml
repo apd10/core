@@ -1,5 +1,5 @@
 module: "Loop"
-device_id: 6
+device_id: 7
 epochs: 10
 train_data:
   file: "/home/apd10/experiments/projects/summary_based_learning/DATA/skin_nonskin.dt/train.txt"

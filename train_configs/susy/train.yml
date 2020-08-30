@@ -1,5 +1,5 @@
 module: "Loop"
-device_id: 0
+device_id: 3
 epochs: 3
 train_data:
   file: "/home/apd10/experiments/projects/summary_based_learning/DATA/SUSY/train.txt"
@@ -38,7 +38,7 @@ progress_train_data:
   simple:
     batch_size: 256
 progress_test_data:
-  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/SUSY/small_test.txt"
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/SUSY/test.txt"
   dataset: "csv"
   csv:
     sep: ","
@@ -63,5 +63,5 @@ loss:
 progress_evaluator:
   name: "simple_print"
   simple_print:
-      eval_itr: 100
+      eval_itr: 5000
       eval_epoch: 1

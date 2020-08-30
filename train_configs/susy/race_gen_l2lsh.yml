@@ -11,17 +11,17 @@ data:
 save_sketch: "/home/apd10/experiments/projects/summary_based_learning/DATA/SUSY/race_sketch_gen.pickle"
 np_seed: 101
 race:
-  power: 15
-  repetitions: 1
+  power: 18
+  repetitions: 2
   num_classes: 2
-  max_coord: 10
-  min_coord: -10
+  max_coord: 40
+  min_coord: -40
   random_seed: 101
   ace_type: "cs"
   ace_params:
     rep : 5
     range : 50000
-    num_keys : 15 # equal to the power
+    num_keys : 18 # equal to the power
     device_id : -1 # to do on cpu. test device as well later
     sketch_type : "CMS" # we only store counts
     recovery : "min" # min recovery
@@ -31,5 +31,5 @@ race:
     l2lsh_torch:
       bandwidth: 0.1
       dimension: 18
-      max_norm: 15
+      max_norm: 50
       device_id: -1

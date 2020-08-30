@@ -2,7 +2,7 @@ module: "Loop"
 device_id: 6
 epochs: 10
 train_data:
-  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/skin_nonskin.dt/race_train_l2lsh_sampled.txt"
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/skin_nonskin.dt/race_train.txt"
   dataset: "csv"
   csv:
     sep: " "

@@ -13,6 +13,8 @@ class HashFunction:
       hash_func = L2LSH_TORCH(params["l2lsh_torch"], num_hashes)
     elif params["name"] == "srp":
       hash_func = SRP(params["srp"], num_hashes)
+    elif params["name"] == "srp_torch":
+      hash_func = SRP_TORCH(params["srp_torch"], num_hashes)
     else:
       raise NotImplementedError
     return hash_func

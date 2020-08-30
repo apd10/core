@@ -102,6 +102,9 @@ class CountSketch() :
 
         if "topK" in params:
             self.topK = params["topK"]
+        self.ignore_1 = False
+        if "ignore_1" in params:
+            self.ignore_1 = True
 
         self.rng = CRNG(self.random_seed)
         self.sketch_memory = torch.zeros((self.K, self.R))
@@ -183,7 +186,11 @@ class CountSketch() :
 
     def get_top(self):
         self.topkds.topk_df.reset_index(drop=True, inplace=True)
-        return self.topkds.topk_df
+        X =  self.topkds.topk_df
+        if self.ignore_1:
+            assert(self.is_cms)
+            X = X[X.value > 1]
+        return X
 
     def get_dictionary(self):
         dic = {}

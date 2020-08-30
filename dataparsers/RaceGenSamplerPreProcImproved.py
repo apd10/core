@@ -29,10 +29,14 @@ def sample_m1(rep, label, hash_values, n_samples):
     
     res = scipy.optimize.linprog(c=np.zeros(Weq.shape[1]), A_ub = Weq, b_ub = Beq)
     point = res.x
+    if not polytope.check_inside(point):
+        x_random = np.random.random(Weq.shape[1])
+        minover = MinOver(polytope=polytope)
+        point, convergence = minover.run(starting_point=x_random, max_iters=global_vars["max_iters"], speed=global_vars["speed"])
 
     assert(polytope.check_inside(point))
     hitandrun = HitAndRun(polytope=polytope, starting_point=point)
-    samples = hitandrun.get_samples(n_samples=n_samples, thin=100) # need better implementation for this. try vaidya-walk
+    samples = hitandrun.get_samples(n_samples=n_samples, thin=10) # need better implementation for this. try vaidya-walk
     return samples, np.repeat(label, n_samples)
 
 def sample_batch(total_num):
@@ -65,7 +69,6 @@ def sample_batch(total_num):
                   else:
                       fcount = int(bucket_counts[bkt])
                   if fcount > 0:
-                      #sample_m1(rep, c, hash_values, fcount)
                       futures.append(executor.submit(sample_m1, rep, c, hash_values, fcount))
                       temp = temp + 1
                   
@@ -75,7 +78,6 @@ def sample_batch(total_num):
           if d is not None:
               datas.append(d[0])
               labels.append(d[1])
-    pdb.set_trace()
     Data = np.concatenate(datas, axis=0)
     Labels = np.concatenate(labels, axis=0)
     return Data, Labels

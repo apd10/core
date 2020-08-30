@@ -7,7 +7,7 @@ data:
   sampler: "simple"
   simple:
     batch_size: 10000
-save_sketch: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist/parameter_tuning/race_sketch_gen_p800.pickle"
+save_sketch: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist/parameter_tuning/X.pickle"
 np_seed: 101
 race:
   power: 800
