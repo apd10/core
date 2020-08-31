@@ -30,6 +30,10 @@ class RaceGen:
     self.hashfunction = HashFunction.get(params["lsh_function"], num_hashes=self.power * self.repetitions)
     self.random_seed = params["random_seed"]
 
+    self.store_norms = False
+    if "store_norms" in params:
+        self.store_norms = params["store_norms"]
+
     
     self.params = params
     self.ace_type = params["ace_type"]
@@ -42,7 +46,7 @@ class RaceGen:
         self.sketch_memory[i] = []
         for rep in range(self.repetitions):
             seed = random_numbers[i*self.repetitions + rep]
-            self.sketch_memory[i].append(Ace.get(self.ace_type, seed, self.ace_params))
+            self.sketch_memory[i].append(Ace.get(self.ace_type, seed, self.ace_params, self.store_norms))
     self.class_counts = np.zeros(self.num_classes)
 
   def sketch(self, x, y):
@@ -51,6 +55,8 @@ class RaceGen:
       y : b x 1 \in [0,num_classes)
     '''
     hashes = self.hashfunction.compute(x) # b x (power*repetitions)
+    if self.store_norms:
+        norms = torch.sqrt(torch.sum(torch.mul(x,x), axis=1))
 
     for rep in range(self.repetitions):
       hash_values  = hashes[:,rep*self.power:(rep+1)*self.power]
@@ -59,7 +65,11 @@ class RaceGen:
           if rep ==0: # add only once
               self.class_counts[c] += examples_perclass.shape[0]
           if examples_perclass.shape[0] > 0:
-              self.sketch_memory[c][rep].insert(examples_perclass, torch.ones((examples_perclass.shape[0], 1)))
+              norms_perclass = None
+              if self.store_norms:
+                  norms_perclass = norms[y == c]
+                  norms_perclass = norms_perclass.reshape(examples_perclass.shape[0],1)
+              self.sketch_memory[c][rep].insert(examples_perclass, torch.ones((examples_perclass.shape[0], 1)), norms_perclass)
 
   def get_dictionary(self):
     race_sketch = {}

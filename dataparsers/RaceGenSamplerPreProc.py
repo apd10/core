@@ -21,11 +21,9 @@ global_vars = {
 }
 
 
-def sample_m1(rep, label, hash_values):
+def sample_m1(rep, label, hash_values, norm = None):
     race = global_vars["race"]
     class_prob = global_vars["class_prob"]
-    Weq,Beq = race.get_equations(np.array(hash_values), rep, len(hash_values))
-    polytope = Polytope(A=Weq, b=Beq)
     
     # getting a point inside the polytope
     #x_random = np.zeros(Weq.shape[1]) # if its SRP then 0 is already in the polygon!
@@ -41,10 +39,18 @@ def sample_m1(rep, label, hash_values):
     #    return None
 
     #pdb.set_trace()
+
+    Weq,Beq = race.get_equations(np.array(hash_values), rep, len(hash_values))
+    polytope = Polytope(A=Weq, b=Beq)
+
     try:
-      res = scipy.optimize.linprog(c=np.zeros(Weq.shape[1]), A_ub = Weq, b_ub = Beq)
+
+      Weq,Beq = race.get_hf_equations(np.array(hash_values), rep, len(hash_values))
+      res = scipy.optimize.linprog(c=np.zeros(Weq.shape[1]), A_ub = Weq, b_ub = Beq, bounds=list(zip(np.ones(Weq.shape[1])*race.params["min_coord"], np.ones(Weq.shape[1])*race.params["max_coord"])))
       point = res.x
       if not polytope.check_inside(point):
+          Weq,Beq = race.get_equations(np.array(hash_values), rep, len(hash_values))
+          polytope = Polytope(A=Weq, b=Beq)
           x_random = np.random.random(Weq.shape[1])
           minover = MinOver(polytope=polytope)
           point, convergence = minover.run(starting_point=x_random, max_iters=global_vars["max_iters"], speed=global_vars["speed"])
@@ -57,10 +63,17 @@ def sample_m1(rep, label, hash_values):
       
     hitandrun = HitAndRun(polytope=polytope, starting_point=point)
     sample = hitandrun.get_samples(n_samples=1, thin=100)
+    if norm is not None:
+        # norm info is present and to be used
+        nsample = sample / np.linalg.norm(sample) * norm
+        sample = nsample
     return sample[0],label
 
 def sample_batch(num, kde_lb):
     race = global_vars["race"]
+    norm_info = False
+    if "store_norms" in race.params:
+        norm_info = race.params["store_norms"]
     class_counts = global_vars["class_prob"] * num
     class_counts = class_counts.astype(int) + 1
     class_prob = global_vars["class_prob"]
@@ -87,8 +100,13 @@ def sample_batch(num, kde_lb):
                 topk_df = sketch.get_top_buckets()
                 values = topk_df["value"].values
                 bucket_idx = np.argmax(np.random.multinomial(1, values/np.sum(values), size=None))
-                hash_values = topk_df.loc[bucket_idx, :].values[:-1]
-                #sample_m1(rep, label, hash_values)
+                hashcols = [a for a in topk_df.columns if a.startswith("C")]
+                hash_values = topk_df[hashcols].loc[bucket_idx, :].values
+                norm = None
+                if norm_info:
+                    norm_sums = topk_df["norm_sum"].values
+                    norm = norm_sums[bucket_idx] / values[bucket_idx]
+                #sample_m1(rep, label, hash_values, norm)
                 futures.append(executor.submit(sample_m1, rep, label, hash_values))
             print("waiting for executions")
             for res in tqdm(concurrent.futures.as_completed(futures), total=this_num):
