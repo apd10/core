@@ -17,7 +17,7 @@ from skopt import gp_minimize
 # number of subprocesses to use for data loading
 num_workers = 0
 # how many samples per batch to load
-batch_size = 1
+batch_size = 20
 
 # convert data to torch.FloatTensor
 transform = transforms.ToTensor()
@@ -52,12 +52,12 @@ def loss_grad_inv(w, x, n_classes, c):
     first_inner_term = np.sum(i_neq_c(classes_except_c))
     second_inner_term = ((exw(c) / exw_j - 1) ** 2)[0]
     loss = (norm(x) ** 2) * (first_inner_term + second_inner_term)
-    print(loss, flush=True)
+    # print(loss, flush=True)
     return 1 / loss
 
 
 def optimization_domain(dim, domain):
-    print("and another c", flush=True)
+    # print("and another c", flush=True)
     return np.array([domain for _ in range(dim)])
 
 
@@ -96,28 +96,28 @@ L = 100  # LSH arrays
 rbp = [RandomBinaryProjections('rbp', K) for i in range(L)]
 # Prepare LSH table
 storage = MemoryStorage()
-engine = Engine(dimension, lshashes=rbp, storage=storage, vector_filters=[NearestFilter(100)])
+engine = Engine(dimension, lshashes=rbp, storage=storage, vector_filters=[NearestFilter(1)])
 
 i = 0
 # Hash data
 for data, target in train_loader_lsh:
     v = data.view(-1, 28 * 28)[0].numpy()
-    if i == 0:
-        print(v)
+    # if i == 0:
+        # print(v)
     engine.store_vector(v, target)
     i += 1
 
 ############
 # TRAINING #
 ############
-n_epochs = 30
+n_epochs = 1
 train_start = time.time()
 for epoch in range(n_epochs):
     epoch_start = time.time()
     # monitor training loss
     train_loss = 0.0
     # track batch with maximum gradient
-    max_grad = 0
+    max_grad = 00
     # max_grad_batch = None
 
     # # Find batch with highest gradient
@@ -135,15 +135,15 @@ for epoch in range(n_epochs):
         return lambda x: loss_grad_inv(model.fc1.weight, x, 10, c)
 
 
-    print("getting max_grad_batch", flush=True)
+    # print("getting max_grad_batch", flush=True)
     max_grad_batch = [gp_minimize(loss_grad_w(c), optimization_domain(28 * 28, (0, 1)), n_calls=10) for c in range(10)]
     # print(max_grad_batch, flush=True)
     # Collect neighbors of data in the batch with maximum gradient
     neighbors = []
     i = 0
     for m in max_grad_batch:
-        if i == 0:
-            print(np.array(m["x"]))
+        # if i == 0:
+        #     print(np.array(m["x"]))
         # v = d.view(-1, 28 * 28)[0].numpy()
         neighbors.extend(engine.neighbours(np.array(m["x"])))
         i += 1
