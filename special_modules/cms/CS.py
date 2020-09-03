@@ -158,8 +158,8 @@ class CountSketch() :
 
         # Insert the top K into the heap structure. Heap with CS setting is a bit unreliable. nonetheless i.i.d samples should work
         if self.topkds is not None:
-          nvalues = self.query(batch_keys) # 1 x B
-          insert_batch = batch_keys
+          insert_batch = torch.unique(batch_keys, dim=0)
+          nvalues = self.query(insert_batch) # 1 x B
           if B > self.topK:
               idx = torch.topk(nvalues, k=self.topK)[1] # topK should be small like 1000
               nvalues = nvalues[idx]
