@@ -1,0 +1,17 @@
+module: "DataWriter"
+epochs: 1
+train_data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/FashionMnist/race_l2lsh_gen.pickle"
+  dataset: "race_gen_pp"
+  race_gen_pp:
+    epoch_samples: 500
+    parallel_batch: 500
+    method: "m1"
+    m1:
+      minover:
+        max_iters: 20
+        speed: 10
+  sampler: "simple"
+  simple:
+    batch_size: 500
+write_data_file: "/home/apd10/experiments/projects/summary_based_learning/DATA/FashionMnist/race_train_l2lsh_sampled.small.txt"

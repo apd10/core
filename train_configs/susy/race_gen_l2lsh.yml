@@ -1,0 +1,35 @@
+module: "RaceGenSketch"
+data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/SUSY/train.txt"
+  dataset: "csv"
+  csv:
+    sep: ","
+    label_header: 0
+  sampler: "simple"
+  simple:
+    batch_size: 50000
+save_sketch: "/home/apd10/experiments/projects/summary_based_learning/DATA/SUSY/race_sketch_gen.pickle"
+np_seed: 101
+race:
+  power: 18
+  repetitions: 2
+  num_classes: 2
+  max_coord: 40
+  min_coord: -40
+  random_seed: 101
+  ace_type: "cs"
+  ace_params:
+    rep : 5
+    range : 50000
+    num_keys : 18 # equal to the power
+    device_id : -1 # to do on cpu. test device as well later
+    sketch_type : "CMS" # we only store counts
+    recovery : "min" # min recovery
+    topK : 50000 # top 1000 buckets should be good
+  lsh_function:
+    name: "l2lsh_torch"
+    l2lsh_torch:
+      bandwidth: 0.1
+      dimension: 18
+      max_norm: 50
+      device_id: -1

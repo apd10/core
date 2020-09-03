@@ -1,0 +1,37 @@
+module: "RaceGenSketch"
+data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/FashionMnist/train.txt"
+  dataset: "csv"
+  csv:
+    sep: ","
+    header: "infer"
+    label_header: "label"
+    normalizer_const: 255
+  sampler: "simple"
+  simple:
+    batch_size: 10000
+save_sketch: "/home/apd10/experiments/projects/summary_based_learning/DATA/FashionMnist/race_l2lsh_gen.pickle"
+np_seed: 101
+race:
+  power: 600
+  repetitions: 2
+  num_classes: 10
+  max_coord: 1
+  min_coord: 0
+  random_seed: 101
+  ace_type: "cs"
+  ace_params:
+    rep : 5
+    range : 50000
+    num_keys : 600 # equal to the power
+    device_id : -1 # to do on cpu. test device as well later
+    sketch_type : "CMS" # we only store counts
+    recovery : "min" # min recovery
+    topK : 5000 # top 1000 buckets should be good
+  lsh_function:
+    name: "l2lsh_torch"
+    l2lsh_torch:
+      bandwidth: 0.1
+      dimension: 784
+      max_norm: 20
+      device_id: -1

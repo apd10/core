@@ -1,0 +1,17 @@
+module: "DataWriter"
+epochs: 1
+train_data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist8m/race_sketch_p5.pickle"
+  dataset: "race_pp"
+  race_pp:
+    epoch_samples: 50
+    parallel_batch: 50
+    method: "m1"
+    m1:
+      minover:
+        max_iters: 500
+        speed: 0.1
+  sampler: "simple"
+  simple:
+    batch_size: 50
+write_data_file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist8m/race_train_l2lsh_sampled_p5.txt"

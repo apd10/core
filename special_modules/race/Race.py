@@ -2,7 +2,9 @@ from Hash import *
 import pdb
 from scipy.sparse import csr_matrix
 
-class Race():
+# DONT USE NUMPY. JUST USE TORCH
+
+class Race:
   def __init__(self, params):
     self.range = params["range"]
     self.repetitions = params["repetitions"]
@@ -60,13 +62,12 @@ class Race():
       update_loc  = np.sum(hash_location_offset_ed[:,rep*self.power:(rep+1)*self.power], axis=1).astype(np.int32)
       if self.rehash:
           raise NotImplementedError
-
-      for i in range(x.shape[0]):
-        c = y[i]
-        self.class_counts[c] += 1
-        loc = update_loc[i]
-        #self.sketch_memory[c][rep][loc] += 1
-        self.sketch_memory[c] = self.sketch_memory[c] +  csr_matrix(([1], ([rep],[loc])), shape=(self.repetitions, 2**32-1), dtype=np.int32)
+      for c in np.arange(self.num_classes):
+          examples_perclass = update_loc[y == c]
+          locs, counts = np.unique(examples_perclass, return_counts=True)
+          if rep == 0:
+              self.class_counts[c] += len(examples_perclass)
+          self.sketch_memory[c] = self.sketch_memory[c] +  csr_matrix((counts, (rep*np.ones(len(locs)),locs)), shape=(self.repetitions, 2**32-1), dtype=np.int32)
 
   def get_dictionary(self):
     race_sketch = {}
@@ -119,8 +120,7 @@ class Race():
       for i in range(x.shape[0]):
         c = y[i]
         loc = locs[i]
-        kde_estimates[i] += self.sketch_memory[c][rep][loc] / np.sum(self.sketch_memory[c][rep]) # to fix before use
+        #kde_estimates[i] += self.sketch_memory[c][rep][loc] / np.sum(self.sketch_memory[c][rep]) # to fix before use
+        kde_estimates[i] += self.sketch_memory[c][rep, loc] #/ self.class_counts[c]  # commenting because it is easier to interpret
     kde_estimates /= self.repetitions
     return kde_estimates
-      
-

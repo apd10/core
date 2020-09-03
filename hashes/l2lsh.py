@@ -85,4 +85,7 @@ class L2LSH():
     b_heq = np.concatenate([b_heq_1, b_heq_2])
     return W_heq, b_heq
     
-  
+  def score_sample():
+    ''' this will compute the sum of scores of all the samples according to the l2lsh 
+        kernel density
+    '''

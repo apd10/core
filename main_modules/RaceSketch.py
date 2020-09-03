@@ -6,6 +6,7 @@ import pdb
 import numpy as np
 import pickle
 from special_modules.race.Race import *
+from tqdm import tqdm
 
 
 class RaceSketch:
@@ -19,7 +20,12 @@ class RaceSketch:
 
     def sketch(self):
         self.data.reset()
-        while not self.data.end():
+        num_samples = self.data.len()
+        batch_size = self.data.batch_size()
+        num_batches = int(np.ceil(num_samples/batch_size))
+        for i in tqdm(range(num_batches)):
+            if self.data.end():
+              break
             x, y = self.data.next()
             x = np.array(x)
             y = np.array(y)

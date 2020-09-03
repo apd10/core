@@ -1,0 +1,37 @@
+module: "RaceGenSketch"
+data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/wordemb/model.txt"
+  dataset: "csv"
+  csv:
+    sep: " "
+    label_header: 0
+    ignore_label: True
+    skiprows : 1
+  sampler: "simple"
+  simple:
+    batch_size: 5000
+save_sketch: "/home/apd10/experiments/projects/summary_based_learning/DATA/wordemb/racegen_sketch.pickle"
+np_seed: 101
+race:
+  power: 200
+  repetitions: 1
+  num_classes: 1
+  max_coord: 0.33
+  min_coord: -0.33
+  random_seed: 101
+  ace_type: "cs"
+  ace_params:
+    rep : 5
+    range : 10000
+    num_keys : 200 # equal to the power
+    device_id : -1 # to do on cpu. test device as well later
+    sketch_type : "CMS" # we only store counts
+    recovery : "min" # min recovery
+    topK : 10000 # top 1000 buckets should be good
+  lsh_function:
+    name: "l2lsh_torch"
+    l2lsh_torch:
+      bandwidth: 0.01
+      dimension: 300
+      max_norm: 1
+      device_id: -1

@@ -36,3 +36,6 @@ class Data:
 
     def len(self):
         return self.total_num_points
+
+    def batch_size(self):
+        return self.sampler.batch_size

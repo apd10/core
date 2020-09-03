@@ -13,6 +13,8 @@ class DataSet:
           dataset = RaceSampler(data_file, params)
         elif name == "race_pp":
           dataset = RaceSamplerPreProc(data_file, params)
+        elif name == "race_gen_pp":
+          dataset = RaceGenSamplerPreProc(data_file, params)
         else:
           raise NotImplementedError
         return dataset
