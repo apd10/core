@@ -10,7 +10,7 @@ from nearpy.filters import NearestFilter
 from nearpy.hashes import RandomBinaryProjections
 from nearpy.storage import MemoryStorage
 import time
-from skopt import gp_minimize
+from scipy import optimize
 
 
 # LOAD DATA
@@ -39,21 +39,21 @@ train_loader_lsh = torch.utils.data.DataLoader(test_data)
 i = 0
 
 
-def loss_grad_inv(w, x, n_classes, c):
+def loss_grad_neg(w, x, n_classes, c):
     classes = np.arange(n_classes)
     classes_except_c = np.array([i for i in range(n_classes) if i != c])
 
     def exw(i):
-        return np.exp([np.matmul(w[i].detach().numpy(), x)])
+        return np.exp(np.inner(w[i], x))
     exw_j = np.sum(exw(classes))
 
     def i_neq_c(i):
         return (exw(i) / exw_j) ** 2
     first_inner_term = np.sum(i_neq_c(classes_except_c))
-    second_inner_term = ((exw(c) / exw_j - 1) ** 2)[0]
+    second_inner_term = ((exw(c) / exw_j - 1) ** 2)
     loss = (norm(x) ** 2) * (first_inner_term + second_inner_term)
     # print(loss, flush=True)
-    return 1 / loss
+    return -loss
 
 
 def optimization_domain(dim, domain):
@@ -61,12 +61,15 @@ def optimization_domain(dim, domain):
     return np.array([domain for _ in range(dim)])
 
 
+img_side_dim = 28
+
+
 # DEFINE NETWORK ARCHITECTURE
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.fc1 = nn.Linear(28 * 28, 10)
-        # linear layer (n_hidden -> hidden_2)
+        self.fc1 = nn.Linear(img_side_dim * img_side_dim, 10)
+        # linear layer (n_hidden -> hidden_2)∑
         self.fc2 = nn.Linear(512, 512)
         # linear layer (n_hidden -> 10)
         self.fc3 = nn.Linear(512, 10)
@@ -76,7 +79,7 @@ class Net(nn.Module):
 
     def forward(self, x):
         # flatten image input
-        x = x.view(-1, 28 * 28)
+        x = x.view(-1, img_side_dim * img_side_dim)
         # add hidden layer, with relu activation function
         x = F.relu(self.fc1(x))
         return x
@@ -89,7 +92,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 model.train()
 
 # PREPARE LSH
-dimension = 784
+dimension = img_side_dim * img_side_dim
 # Prepare LSH functions
 K = 10  # LSH concatenations
 L = 100  # LSH arrays
@@ -101,7 +104,7 @@ engine = Engine(dimension, lshashes=rbp, storage=storage, vector_filters=[Neares
 i = 0
 # Hash data
 for data, target in train_loader_lsh:
-    v = data.view(-1, 28 * 28)[0].numpy()
+    v = data.view(-1, img_side_dim * img_side_dim)[0].numpy()
     # if i == 0:
         # print(v)
     engine.store_vector(v, target)
@@ -110,7 +113,7 @@ for data, target in train_loader_lsh:
 ############
 # TRAINING #
 ############
-n_epochs = 1
+n_epochs = 5
 train_start = time.time()
 for epoch in range(n_epochs):
     epoch_start = time.time()
@@ -120,25 +123,14 @@ for epoch in range(n_epochs):
     max_grad = 00
     # max_grad_batch = None
 
-    # # Find batch with highest gradient
-    # for data, target in train_loader:
-    #     optimizer.zero_grad()
-    #     output = model(data)
-    #     loss = criterion(output, target)
-    #     loss.backward()
-    #     # calculate gradient and adjust max grad
-    #     grad = np.linalg.norm(model.fc1.weight.grad.numpy())
-    #     if grad > max_grad:
-    #         max_grad = grad
-    #         max_grad_batch = data
     def loss_grad_w(c):
-        return lambda x: loss_grad_inv(model.fc1.weight, x, 10, c)
+        return lambda x: loss_grad_neg(model.fc1.weight.data.numpy(), x, 10, c)
+    max_grad_batch = [optimize.minimize(loss_grad_w(c), np.random.rand(img_side_dim * img_side_dim),
+                                        bounds=optimization_domain(img_side_dim * img_side_dim, (0, 1)))
+                      for c in range(10)]
 
-
-    # print("getting max_grad_batch", flush=True)
-    max_grad_batch = [gp_minimize(loss_grad_w(c), optimization_domain(28 * 28, (0, 1)), n_calls=10) for c in range(10)]
-    # print(max_grad_batch, flush=True)
-    # Collect neighbors of data in the batch with maximum gradient
+    print(max_grad_batch)
+    # Collect neighbors of
     neighbors = []
     i = 0
     for m in max_grad_batch:
@@ -150,7 +142,7 @@ for epoch in range(n_epochs):
     print(len(neighbors))
 
     # Reformat to be compatible with data loader
-    neighbors = [(torch.from_numpy(v).view(1, 28, 28).float(), data.numpy()[0]) for (v, data, distance) in neighbors]
+    neighbors = [(torch.from_numpy(v).view(1, img_side_dim, img_side_dim).float(), data.numpy()[0]) for (v, data, distance) in neighbors]
     train_loader_2 = torch.utils.data.DataLoader(neighbors, batch_size=batch_size,
                                                  num_workers=num_workers)
 
