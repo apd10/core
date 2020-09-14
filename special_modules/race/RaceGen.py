@@ -29,6 +29,9 @@ class RaceGen:
     self.min_coord = params["min_coord"]
     self.hashfunction = HashFunction.get(params["lsh_function"], num_hashes=self.power * self.repetitions)
     self.random_seed = params["random_seed"]
+    if "np_seed" in params:
+      self.np_seed = params["np_seed"]
+      np.random.seed(self.np_seed)
 
     self.store_norms = False
     if "store_norms" in params:
@@ -122,3 +125,30 @@ class RaceGen:
   def query(self, x, y):
     ''' return the K.D.E value for x w.r.t class y '''
     raise NotImplementedError
+
+  def query_values(self, x):
+    ''' aggregate the counts of all aces we have for each class
+        if y is not specified. '''
+    ''' this is batch wise
+    '''
+    hashes = self.hashfunction.compute(x) # b x (power*repetitions)
+    values = torch.zeros((x.shape[0], self.num_classes * self.repetitions))
+    for c in range(self.num_classes):
+        for rep in range(self.repetitions):
+            hash_values  = hashes[:,rep*self.power:(rep+1)*self.power]
+            idx = self.repetitions * c + rep
+            ace = self.sketch_memory[c][rep]
+            cts = ace.query(hash_values)
+            values[:, idx] = cts
+    return values
+
+  def onDecay(self, samples):
+    for c in range(self.num_classes):
+      for rep in range(self.repetitions):
+        ace = self.sketch_memory[c][rep]
+        ace.onDecay(samples)
+              
+
+            
+      
+

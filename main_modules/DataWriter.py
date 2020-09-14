@@ -25,5 +25,5 @@ class DataWriter:
                   x, y = self.train_data.next()
                   y = y.reshape(len(y),1).float()
                   data = torch.cat([y, x], axis=1)
-                  np.savetxt(f, data)
+                  np.savetxt(f, data, fmt="%.6f")
               epoch = epoch + 1

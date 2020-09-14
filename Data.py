@@ -1,8 +1,8 @@
 import torch
 from torch import nn
 from torch.autograd import Variable
-from DataSet import *
-from Sampler import *
+from DataSet import DataSet
+from Sampler import Sampler
 import pdb
 
 class Data:

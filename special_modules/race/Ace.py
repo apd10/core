@@ -22,6 +22,7 @@ class AceArray():
     def get_top_buckets(self):
         raise NotImplementedError
 
+
 class AceCS():
     def __init__(self, seed, params, norm_info):
         self.countsketch = CountSketch(seed, params)
@@ -64,3 +65,6 @@ class AceCS():
 
     def set_dictionary(self, dic):
         return self.countsketch.set_dictionary(dic)
+
+    def onDecay(self, samples):
+        self.countsketch.onDecay(samples)

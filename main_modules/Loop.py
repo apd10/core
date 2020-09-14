@@ -1,12 +1,14 @@
 import torch
 from torch import nn
 from torch.autograd import Variable
-from Data import *
-from Model import *
-from Optimizer import *
-from Loss import *
-from ProgressEvaluator import *
+from Data import Data
+from Model import Model
+from Optimizer import Optimizer
+from Loss import Loss
+from ProgressEvaluator import ProgressEvaluator
 import pdb
+import numpy as np
+from tqdm import tqdm
 
 class Loop:
     def __init__(self, params):
@@ -14,9 +16,10 @@ class Loop:
         self.epochs = params["epochs"]
         # data
         self.train_data = Data(params["train_data"])
-        self.test_data = Data(params["test_data"])
-        self.validation_data = Data(params["validation_data"])
-        self.progress_train_data = Data(params["progress_train_data"])
+        #self.test_data = Data(params["test_data"])
+        #self.validation_data = Data(params["validation_data"])
+        #self.progress_train_data = Data(params["progress_train_data"])
+        self.progress_train_data = None
         self.progress_test_data = Data(params["progress_test_data"])
         # model
         self.model = Model.get(params["model"])

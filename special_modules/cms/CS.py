@@ -105,6 +105,17 @@ class CountSketch() :
         self.ignore_1 = False
         if "ignore_1" in params:
             self.ignore_1 = True
+        self.is_decay_on = False
+        if "decay" in params:
+            self.is_decay_on = True
+            self.decay_params = params["decay"]
+            self.on_sample_alpha = None
+            if "alpha" in self.decay_params:
+                self.on_sample_alpha = self.decay_params["alpha"]
+            if "half_life" in self.decay_params:
+                hl = self.decay_params["half_life"]
+                self.on_sample_alpha = np.power(2, -1/hl)
+            assert(self.on_sample_alpha is not None)
 
         self.rng = CRNG(self.random_seed)
         self.sketch_memory = torch.zeros((self.K, self.R))
@@ -208,6 +219,14 @@ class CountSketch() :
             self.sketch_memory = self.sketch_memory.cuda(self.device_id)
         assert(self.random_seed == dic["random_seed"])
         assert(self.params == dic["params"])
+
+    def onDecay(self, samples=1):
+        # add samples worth of decay
+        if not self.is_decay_on:
+            return
+        decay = float(np.power(self.on_sample_alpha, samples))
+        self.sketch_memory = self.sketch_memory * decay
+        
 
 if __name__ == "__main__":
     torch.manual_seed(101)

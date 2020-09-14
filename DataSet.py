@@ -1,3 +1,4 @@
+#from dataparsers.list_dataparsers import GenSVMFormatParser, CSVParser, RaceSampler, RaceSamplerPreProc, RaceGenSamplerPreProc, RunningRaceParser
 from dataparsers.list_dataparsers import *
 
 
@@ -15,8 +16,11 @@ class DataSet:
           dataset = RaceSamplerPreProc(data_file, params)
         elif name == "race_gen_pp":
           dataset = RaceGenSamplerPreProc(data_file, params)
+        elif name == "running_race":
+          dataset = RunningRaceParser(data_file, params)
         else:
           raise NotImplementedError
         return dataset
+
 
 
