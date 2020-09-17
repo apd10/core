@@ -85,6 +85,49 @@ class Net(nn.Module):
         return x
 
 
+
+def test(model):
+  test_loss = 0.0
+  class_correct = list(0. for i in range(10))
+  class_total = list(0. for i in range(10))
+  
+  model.eval() # prep model for *evaluation*
+  
+  for data, target in test_loader:
+      # forward pass: compute predicted outputs by passing inputs to the model
+      output = model(data)
+      # calculate the loss
+      loss = criterion(output, target)
+      # update test loss
+      test_loss += loss.item()*data.size(0)
+      # convert output probabilities to predicted class
+      _, pred = torch.max(output, 1)
+      # compare predictions to true label
+      correct = np.squeeze(pred.eq(target.data.view_as(pred)))
+      # calculate test accuracy for each object class
+      for i in range(batch_size):
+          label = target.data[i]
+          class_correct[label] += correct[i].item()
+          class_total[label] += 1
+  
+  # calculate and print avg test loss
+  test_loss = test_loss/len(test_loader.dataset)
+  print('Test Loss: {:.6f}\n'.format(test_loss))
+  
+  #for i in range(10):
+  #    if class_total[i] > 0:
+  #        print('Test Accuracy of %5s: %2d%% (%2d/%2d)' % (
+  #            str(i), 100 * class_correct[i] / class_total[i],
+  #            np.sum(class_correct[i]), np.sum(class_total[i])))
+  #    else:
+  #        print('Test Accuracy of %5s: N/A (no training examples)' % (class_total[i]))
+  
+  print('\nTest Accuracy (Overall): %2d%% (%2d/%2d)' % (
+      100. * np.sum(class_correct) / np.sum(class_total),
+      np.sum(class_correct), np.sum(class_total)))
+  
+  
+
 # initialize the NN
 model = Net()
 criterion = nn.CrossEntropyLoss()
@@ -113,10 +156,10 @@ for data, target in train_loader_lsh:
 ############
 # TRAINING #
 ############
-n_epochs = 5
+n_iterations = 60000
 train_start = time.time()
-for epoch in range(n_epochs):
-    epoch_start = time.time()
+for itr in range(n_iterations):
+    itr_start = time.time()
     # monitor training loss
     train_loss = 0.0
     # track batch with maximum gradient
@@ -125,11 +168,14 @@ for epoch in range(n_epochs):
 
     def loss_grad_w(c):
         return lambda x: loss_grad_neg(model.fc1.weight.data.numpy(), x, 10, c)
+
+    this_class = np.random.randint(0, 10)
+    print(this_class)
     max_grad_batch = [optimize.minimize(loss_grad_w(c), np.random.rand(img_side_dim * img_side_dim),
                                         bounds=optimization_domain(img_side_dim * img_side_dim, (0, 1)))
-                      for c in range(10)]
+                      for c in [this_class]]
 
-    print(max_grad_batch)
+    #print(max_grad_batch)
     # Collect neighbors of
     neighbors = []
     i = 0
@@ -139,8 +185,7 @@ for epoch in range(n_epochs):
         # v = d.view(-1, 28 * 28)[0].numpy()
         neighbors.extend(engine.neighbours(np.array(m["x"])))
         i += 1
-    print(len(neighbors))
-
+    print(neighbors)
     # Reformat to be compatible with data loader
     neighbors = [(torch.from_numpy(v).view(1, img_side_dim, img_side_dim).float(), data.numpy()[0]) for (v, data, distance) in neighbors]
     train_loader_2 = torch.utils.data.DataLoader(neighbors, batch_size=batch_size,
@@ -155,62 +200,26 @@ for epoch in range(n_epochs):
         optimizer.step()
         train_loss += loss.item() * data.size(0)
 
-    epoch_end = time.time()
-    print(epoch_end - epoch_start, "seconds for this epoch")
+    itr_end = time.time()
+    #print(itr_end - itr_start, "seconds for this itr")
 
     # print training statistics
-    # calculate average loss over an epoch
+    # calculate average loss over an itr
     train_loss = train_loss / len(train_loader_2.dataset)
 
-    print('Epoch: {} \tTraining Loss: {:.6f}'.format(
-        epoch + 1,
-        train_loss
-    ))
+    #print('Epoch: {} \tTraining Loss: {:.6f}'.format(
+    #    itr + 1,
+    #    train_loss
+    #))
+    if itr % 50 == 0:
+        test(model)
+        model.train()
 
 train_end = time.time()
 train_time = train_end - train_start
 print(f'Trained in {train_time} seconds')
+test(model)
 
 
 # TEST NETWORK
 # initialize lists to monitor test loss and accuracy
-test_loss = 0.0
-class_correct = list(0. for i in range(10))
-class_total = list(0. for i in range(10))
-
-model.eval() # prep model for *evaluation*
-
-for data, target in test_loader:
-    # forward pass: compute predicted outputs by passing inputs to the model
-    output = model(data)
-    # calculate the loss
-    loss = criterion(output, target)
-    # update test loss
-    test_loss += loss.item()*data.size(0)
-    # convert output probabilities to predicted class
-    _, pred = torch.max(output, 1)
-    # compare predictions to true label
-    correct = np.squeeze(pred.eq(target.data.view_as(pred)))
-    # calculate test accuracy for each object class
-    for i in range(batch_size):
-        label = target.data[i]
-        class_correct[label] += correct[i].item()
-        class_total[label] += 1
-
-# calculate and print avg test loss
-test_loss = test_loss/len(test_loader.dataset)
-print('Test Loss: {:.6f}\n'.format(test_loss))
-
-for i in range(10):
-    if class_total[i] > 0:
-        print('Test Accuracy of %5s: %2d%% (%2d/%2d)' % (
-            str(i), 100 * class_correct[i] / class_total[i],
-            np.sum(class_correct[i]), np.sum(class_total[i])))
-    else:
-        print('Test Accuracy of %5s: N/A (no training examples)' % (class_total[i]))
-
-print('\nTest Accuracy (Overall): %2d%% (%2d/%2d)' % (
-    100. * np.sum(class_correct) / np.sum(class_total),
-    np.sum(class_correct), np.sum(class_total)))
-
-

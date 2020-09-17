@@ -171,7 +171,7 @@ class CountSketch() :
         if self.topkds is not None:
           insert_batch = torch.unique(batch_keys, dim=0)
           nvalues = self.query(insert_batch) # 1 x B
-          if B > self.topK:
+          if insert_batch.shape[0] > self.topK:
               idx = torch.topk(nvalues, k=self.topK)[1] # topK should be small like 1000
               nvalues = nvalues[idx]
               insert_batch = insert_batch[idx, :] # min(topK,B) x num_keys
