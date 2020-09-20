@@ -1,0 +1,45 @@
+module: "DataWriter"
+epochs: 1
+train_data:
+  file: ""
+  dataset: "running_race"
+  running_race:
+    underlying_data:
+      file: "/home/apd10/experiments/projects/summary_based_learning/DATA/simple2d/train_1.txt"
+      dataset: "csv"
+      csv:
+        sep: " "
+        label_header: 0
+      sampler: "simple"
+      simple:
+        batch_size: 100
+    race:
+      power: 5
+      repetitions: 10
+      num_classes: 2
+      max_coord: 10
+      min_coord: -10
+      np_seed: 101
+      random_seed: 101
+      ace_type: "cs"
+      ace_params:
+        rep : 1
+        range : 5000 # 50K
+        num_keys : 5 # equal to the power # 5
+        device_id : -1 # to do on cpu. test device as well later 
+        sketch_type : "CMS" # we only store counts
+        recovery : "min" # min recovery
+        decay:
+          half_life: 5000 # sample 5000 samples before now, will have weight 1/2
+      lsh_function:
+        name: "srp_torch"
+        srp_torch:
+          np_seed: 105
+          dimension: 2
+          device_id: -1
+    skip_rows: 10000
+    save_final_sketch: "/home/apd10/experiments/projects/summary_based_learning/DATA/simple2d/train_1_race_final.pickle"
+  sampler: "simple"
+  simple:
+    batch_size: 10000
+write_data_file: "/home/apd10/experiments/projects/summary_based_learning/DATA/simple2d/train_1_race_counts.txt"

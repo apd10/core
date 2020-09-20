@@ -1,0 +1,44 @@
+module: "DataWriter"
+epochs: 1
+train_data:
+  file: ""
+  dataset: "running_race"
+  running_race:
+    underlying_data:
+      file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist/centered_test.txt"
+      dataset: "gensvm"
+      gensvm:
+        dimension: 784
+      sampler: "simple"
+      simple:
+        batch_size: 100
+    race:
+      power: 10
+      repetitions: 10
+      num_classes: 10
+      max_coord: 1
+      min_coord: 0
+      np_seed: 101
+      random_seed: 101
+      ace_type: "cs"
+      ace_params:
+        rep : 1
+        range : 1000
+        num_keys : 10 # equal to the power
+        device_id : -1 # to do on cpu. test device as well later
+        sketch_type : "CMS" # we only store counts
+        recovery : "min" # min recovery
+        decay:
+          half_life: 500
+      lsh_function:
+        name: "srp_torch"
+        srp_torch:
+          np_seed: 105
+          dimension: 784
+          device_id: -1
+    skip_rows: 500
+    save_final_sketch: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist/concept_shift/test_race_final.pickle"
+  sampler: "simple"
+  simple:
+    batch_size: 100
+write_data_file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist/concept_shift/test_race_counts.txt"

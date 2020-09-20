@@ -1,0 +1,17 @@
+module: "DataWriter"
+epochs: 1
+train_data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist/centered/race_sketch_centered.p20.pickle"
+  dataset: "race_gen_pp"
+  race_gen_pp:
+    epoch_samples: 50
+    parallel_batch: 50
+    method: "m1"
+    m1:
+      minover:
+        max_iters: 20
+        speed: 10
+  sampler: "simple"
+  simple:
+    batch_size: 10
+write_data_file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist/centered/race_centered_sampled_p20.txt"

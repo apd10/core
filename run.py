@@ -1,3 +1,4 @@
+#! /home/apd10/anaconda3/bin/python
 import torch
 torch.manual_seed(0)
 from torch import nn

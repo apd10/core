@@ -1,0 +1,17 @@
+module: "DataWriter"
+epochs: 1
+train_data:
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist/parameter_tuning/sketch.50.5.0.4.5000.pickle"
+  dataset: "race_gen_pp"
+  race_gen_pp:
+    epoch_samples: 60000
+    parallel_batch: 1000
+    method: "m1"
+    m1:
+      minover:
+        max_iters: 20
+        speed: 10
+  sampler: "simple"
+  simple:
+    batch_size: 10
+write_data_file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist/parameter_tuning/sample.50.5.0.4.5000.txt"

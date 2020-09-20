@@ -1,0 +1,6 @@
+taskset -c 45-88  /home/apd10/experiments/projects/summary_based_learning/run.py --config /home/apd10/experiments/projects/summary_based_learning/train_configs/mnist/parameter_tuning/sample.5.25.0.4.5000.yml
+taskset -c 45-88  /home/apd10/experiments/projects/summary_based_learning/run.py --config /home/apd10/experiments/projects/summary_based_learning/train_configs/mnist/parameter_tuning/sample.5.50.0.4.5000.yml
+taskset -c 45-88  /home/apd10/experiments/projects/summary_based_learning/run.py --config /home/apd10/experiments/projects/summary_based_learning/train_configs/mnist/parameter_tuning/sample.50.25.0.4.5000.yml
+taskset -c 45-88  /home/apd10/experiments/projects/summary_based_learning/run.py --config /home/apd10/experiments/projects/summary_based_learning/train_configs/mnist/parameter_tuning/sample.50.50.0.4.5000.yml
+taskset -c 45-88  /home/apd10/experiments/projects/summary_based_learning/run.py --config /home/apd10/experiments/projects/summary_based_learning/train_configs/mnist/parameter_tuning/sample.5.10.0.2.5000.yml
+taskset -c 45-88  /home/apd10/experiments/projects/summary_based_learning/run.py --config /home/apd10/experiments/projects/summary_based_learning/train_configs/mnist/parameter_tuning/sample.50.10.0.2.5000.yml
