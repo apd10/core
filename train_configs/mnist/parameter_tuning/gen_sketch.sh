@@ -1,8 +1,8 @@
-for rep in 5 10 50 100;
+for rep in 5;
 do
-  for power in 10 25 50
+  for power in 784
   do
-    for bw in 0.1 0.2 0.4;
+    for bw in 0.01;
       do 
         for heap in 5000;
         do

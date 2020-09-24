@@ -65,6 +65,19 @@ class L2LSH_TORCH():
       self.b = self.b.cuda(self.device_id)
 
 
+  def get_w(self, rep, chunk_size):
+    Worig = np.array(self.W.cpu())
+    W = Worig.transpose()[rep*chunk_size:(rep+1)*chunk_size,:]
+    return W
+
+  def get_b(self, rep, chunk_size):
+    Borig = np.array(self.b.cpu())
+    B = Borig[rep*chunk_size:(rep+1)*chunk_size]
+    return B
+  
+  def get_r(self):
+    return np.float(self.r)
+
   def get_equations(self, hashvalues, rep, chunk_size):
     assert(chunk_size == len(hashvalues)) # remove chunk_size
     Worig = np.array(self.W.cpu())

@@ -10,8 +10,14 @@ class SimplePrintEvaluator:
       self.device_id = device_id
       self.eval_itr = params["eval_itr"]
       self.eval_epoch = params["eval_epoch"]
+      self.skip_0 = False
+      if "skip_0" in params:
+          self.skip_0  = params["skip_0"]
 
     def evaluate(self, epoch, loc_itr, iteration, model, loss_func): # also logs
+        if self.skip_0 :
+            if epoch == 0 and loc_itr == 0:
+                return
         if iteration % self.eval_itr == 0 or (epoch % self.eval_epoch == 0 and loc_itr == 0):
             #self._eval(epoch, loc_itr, iteration, model, loss_func, self.train_data, "TRAIN")
             self._eval(epoch, loc_itr, iteration, model, loss_func, self.test_data, "TEST")

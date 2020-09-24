@@ -100,6 +100,15 @@ class RaceGen:
     W_heq, b_heq = self.hashfunction.get_equations(hash_values, rep, chunk_size)
     return W_heq, b_heq
 
+  def get_w(self, rep, chunk_size):
+    return self.hashfunction.get_w(rep, chunk_size)
+
+  def get_b(self, rep, chunk_size):
+    return self.hashfunction.get_b(rep, chunk_size)
+
+  def get_r(self):
+    return self.hashfunction.get_r()
+
   def get_bounding_equations(self):
     W_max = np.identity(self.hashfunction.d)
     b_max = np.ones(self.hashfunction.d) * self.max_coord

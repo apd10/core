@@ -1,6 +1,7 @@
-from dataparsers.list_primary_dataparsers import GenSVMFormatParser, CSVParser
+from dataparsers.list_primary_dataparsers import GenSVMFormatParser, CSVParser, BinParser
 from dataparsers.RaceSampler import RaceSampler
 from dataparsers.RaceSamplerPreProc import RaceSamplerPreProc
 from dataparsers.RaceGenSamplerPreProc import RaceGenSamplerPreProc
+from dataparsers.RaceSamplePPD import RaceSamplePPD
 #from dataparsers.RaceGenSamplerPreProcImproved import *
 from dataparsers.RunningRaceParser import RunningRaceParser

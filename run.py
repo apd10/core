@@ -16,6 +16,7 @@ import glob
 cur_dir = dirname(abspath(__file__))
 import yaml
 from main_modules.Loop import *
+from main_modules.Stats import *
 from main_modules.RaceSketch import *
 from main_modules.RaceGenSketch import *
 from main_modules.DataWriter import *
@@ -40,5 +41,8 @@ elif config["module"] == "RaceGenSketch":
 elif config["module"] == "DataWriter":
   run = DataWriter(config)
   run.loop()
+elif config["module"] == "Stats":
+  run = Stats(config)
+  run.run()
 else:
   raise NotImplementedError

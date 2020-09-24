@@ -10,10 +10,14 @@ class DataSet:
           dataset = GenSVMFormatParser(data_file, params)
         elif name == "csv":
           dataset = CSVParser(data_file, params)
+        elif name == "bin":
+          dataset = BinParser(data_file, params)
         elif name == "race":
           dataset = RaceSampler(data_file, params)
         elif name == "race_pp":
           dataset = RaceSamplerPreProc(data_file, params)
+        elif name == "race_ppd":
+          dataset = RaceSamplePPD(data_file, params)
         elif name == "race_gen_pp":
           dataset = RaceGenSamplerPreProc(data_file, params)
         elif name == "running_race":
