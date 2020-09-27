@@ -1,0 +1,111 @@
+feature   name                  source         type            class           training        size            testing         size            feature
+string    mnist                 (string        format)         [SL96a]         string          60000           10000           string
+2         fourclass             [TKH96a]       classification  2               862             2
+3         skin_nonskin          UCI            classification  2               245057          3
+4         iris                  UCI            classification  3               150             4
+4         svmguide1             [CWH03a]       classification  2               3089            4000            4
+5         liver-disorders       UCI            classification  2               145             200             5
+6         mg                    [GWF01a]       regression      1385            6
+6         space_ga              StatLib        regression      3107            6
+7         mpg                   UCI            regression      392             7
+8         abalone               UCI            regression      4177            8
+8         cadata                StatLib        regression      20640           8
+8         cod-rna               [AVU06a]       classification  2               59535           8
+8         diabetes              UCI            classification  2               768             8
+9         glass                 UCI            classification  6               214             9
+9         shuttle               Statlog        classification  7               43500           14500           9
+10        breast-cancer         UCI            classification  2               683             10
+10        poker                 UCI            classification  10              25010           1000000         10
+10        svmguide4             [CWH03a]       classification  6               300             312             10
+10        vowel                 UCI            classification  11              528             462             10
+12        cpusmall              Delve          regression      8192            12
+13        heart                 Statlog        classification  2               270             13
+13        housing               UCI            regression      506             13
+13        wine                  UCI            classification  3               178             13
+14        australian            Statlog        classification  2               690             14
+14        bodyfat               StatLib        regression      252             14
+16        eunite2001            regression     336             31              16
+16        letter                Statlog        classification  26              15000           5000            16
+16        pendigits             UCI            classification  10              7494            3498            16
+18        SUSY                  UCI            classification  2               5000000         18
+18        vehicle               Statlog        classification  4               846             18
+19        segment               Statlog        classification  7               2310            19
+20        svmguide2             [CWH03a]       classification  3               391             20
+21        svmguide3             [CWH03a]       classification  2               1243            41              21
+22        ijcnn1                [DP01a]        classification  2               49990           91701           22
+24        german.numer          Statlog        classification  2               1000            24
+27        pyrim                 UCI            regression      74              27
+28        HIGGS                 UCI            classification  2               11000000        28
+34        ionosphere            UCI            classification  2               351             34
+36        satimage              Statlog        classification  6               4435            2000            36
+48        Sensorless            UCI            classification  11              58509           48
+50        SensIT                Vehicle        (acoustic)      3               78823           19705      50
+50        SensIT                Vehicle        (seismic)       3               78823           19705      50
+54        covtype.binary        UCI            classification  2               581012          54
+54        covtype               UCI            classification  7               581012          54
+60        sonar                 UCI            classification  2               208             60
+60        splice                Delve          classification  2               1000            2175            60
+60        triazines             UCI            regression      186             60
+68        phishing              UCI            classification  2               11055           68
+90        YearPredictionMSD     UCI            regression      463715          51630           90
+100       SensIT                Vehicle        (combined)      Sensit          [MD04a]         classification  3               78823           19705      100
+103       yeast                 [AE02a]        multi-label     14              1500            917             103
+112       mushrooms             UCI            classification  2               8124            112
+120       mediamill             (exp1)         Mediamill       multi-label     101             30993           12914           120
+123       a1a                   UCI            classification  2               1605            30956           123
+123       a2a                   UCI            classification  2               2265            30296           123
+123       a3a                   UCI            classification  2               3185            29376           123
+123       a4a                   UCI            classification  2               4781            27780           123
+123       a5a                   UCI            classification  2               6414            26147           123
+123       a6a                   UCI            classification  2               11220           21341           123
+123       a7a                   UCI            classification  2               16100           16461           123
+123       a8a                   UCI            classification  2               22696           9865            123
+123       a9a                   UCI            classification  2               32561           16281           123
+126       connect-4             UCI            classification  3               67557           126
+128       aloi                  aloi           [AR14a]         classification  1000            108000          128
+180       dna                   Statlog        classification  3               2000            1186            180
+256       usps                  [JJH94a]       classification  10              7291            2007            256
+294       scene-classification  [MB04a]        multi-label     6               1211            1196            294
+300       w1a                   [JP98a]        classification  2               2477            47272           300
+300       w2a                   [JP98a]        classification  2               3470            46279           300
+300       w3a                   [JP98a]        classification  2               4912            44837           300
+300       w4a                   [JP98a]        classification  2               7366            42383           300
+300       w5a                   [JP98a]        classification  2               9888            39861           300
+300       w6a                   [JP98a]        classification  2               17188           32561           300
+300       w7a                   [JP98a]        classification  2               24692           25057           300
+300       w8a                   [JP98a]        classification  2               49749           14951           300
+357       protein               [JYW02a]       classification  3               17766           6621            357
+500       madelon               NIPS           2003            Feature         Selection       Challenge       [IG05a]         classification  2          2000            600     500
+780       mnist                 [YL98a]        classification  10              60000           10000           780
+784       mnist8m               Invariant      SVM             [GL07b]         classification  10              8100000         784
+2000      colon-cancer          [AU99a]        classification  2               62              2000
+2000      epsilon               PASCAL         Challenge       2008            classification  2               400000          100000          2000
+3072      cifar10               The            CIFAR-10        dataset         [AK09a]         classification  10              50000           10000      3072
+3072      SVHN                  SVHN           [YN11a]         classification  10              73257           26032           3072
+5000      gisette               NIPS           2003            Feature         Selection       Challenge       [IG05a]         classification  2          6000            1000    5000
+7129      duke                  breast-cancer  [MW01a]         classification  2               44              7129
+7129      leukemia              [TG99a]        classification  2               38              34              7129
+18432     smallNORB             The            Small           NORB            Dataset         [YL04b]         classification  5               24300      24300           18432
+20958     real-sim              A.             McCallum        classification  2               72309           20958
+30438     siam-competition2007  SIAM           Text            Mining          Competition     2007            multi-label     22              21519      7077            30438
+47236     rcv1.binary           [DL04b]        classification  2               20242           677399          47236
+47236     rcv1.multiclass       [DL04b]        classification  53              15564           518571          47236
+47236     rcv1v2                (industries;   full            sets)           [DL04b]         multi-label     313             23149           781265     47236
+47236     rcv1v2                (regions;      full            sets)           [DL04b]         multi-label     228             23149           781265     47236
+47236     rcv1v2                (topics;       full            sets)           [DL04b]         multi-label     101             23149           781265     47236
+47236     rcv1v2                (topics;       subsets)        [DL04b]         multi-label     101             3000            3000            47236
+55197     sector                [AM98a]        classification  105             6412            3207            55197
+62061     news20                [KL95a]        classification  20              15935           3993            62061
+150360    E2006-tfidf           10-K           Corpus          regression      16087           3308            150360
+1000000   avazu                 Avazu's        Click-through   Prediction      classification  2               40428967        4577464         1000000
+1000000   criteo                Criteo's       Display         Advertising     Challenge       classification  2               45840617        6042135    1000000
+1000000   criteo_tb             Criteo's       Terabyte        Click           Logs            classification  2               4195197692      178274637  1000000
+1163024   kdd2010               raw            version         (bridge         to              algebra)        KDD             CUP             2010       classification  2       19264097  748401  1163024
+1355191   news20.binary         [SSK05a]       classification  2               19996           1355191
+3231961   url                   [JM09a]        classification  2               2396130         3231961
+4272227   E2006-log1p           10-K           Corpus          regression      16087           3308            4272227
+11725480  splice-site           [SS10aAA12a]   classification  2               50000000        4627840         11725480
+16609143  webspam               Webb           Spam            Corpus          [ST06a]         classification  2               350000          16609143
+20216830  kdd2010               (algebra)      KDD             CUP             2010            classification  2               8407752         510302     20216830
+29890095  kdd2010               (bridge        to              algebra)        KDD             CUP             2010            classification  2          19264097        748401  29890095
+54686452  kdd2012               KDD            CUP             2012            classification  2               149639105       54686452

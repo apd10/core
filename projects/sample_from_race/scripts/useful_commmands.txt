@@ -1,0 +1,2 @@
+python3 compare_data_sets.py --original ../../../DATA/simulated/data.txt --sampled ../../../DATA/simulated/race_train_l2lsh_sampled.txt --orig_type csv --bandwidth 0.1
+
