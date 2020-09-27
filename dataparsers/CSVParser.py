@@ -29,6 +29,13 @@ class CSVParser(data.Dataset):
 
         if "normalizer_const" in params:
             self.X = self.X / params["normalizer_const"]
+        self.center = False
+        if "centering_info" in params:
+            self.center = True
+            f = params["centering_info"]
+            r = np.load(f)
+            self.mu = r["mu"]
+            self.std = r["std"]
 
         self.length = self.X.shape[0]
         self.dimension = self.X.shape[1]
@@ -39,5 +46,7 @@ class CSVParser(data.Dataset):
     def __getitem__(self, index):
         label = self.labels[index]
         data_point = np.array(self.X.loc[index].values)
+        if self.center:
+            data_point = (data_point - self.mu) / self.std
         return data_point, label
 

@@ -21,103 +21,116 @@ global_vars = {
 }
 
 
-def sample_m1(rep, label, hash_values, norm = None):
+def sample_m1(rep, label, hash_values, num_points):
     race = global_vars["race"]
     class_prob = global_vars["class_prob"]
     # Gonna write W.x  target_values * width -B . W : D x D  B : D x 1
-    target_values = np.random.uniform(size=len(hash_values)) + hash_values 
-    W = race.get_w(rep, len(hash_values)) # W : P X D
-    B = race.get_b(rep, len(hash_values)) # B : P
-    width = race.get_r()
+    ds = []
+    labels = []
 
-    assert(W.shape[1] >=  W.shape[0])
+    for i in range(num_points):
+        target_values = np.random.uniform(size=len(hash_values)) + hash_values 
+        W = race.get_w(rep, len(hash_values)) # W : P X D
+        B = race.get_b(rep, len(hash_values)) # B : P
+        width = race.get_r()
+    
+        assert(W.shape[1] >=  W.shape[0])
+        # extra equations if required
+        if W.shape[1] > W.shape[0]:
+            print("TEST this code")
+            pdb.set_trace() # test this code
+            p = W.shape[0]
+            dim = W.shape[1]
+            extra = dim - p
+            coords = np.random.randint(0, dim, size=extra)
+            coord_values = np.random.uniform(size=extra)
+            coord_values = coord_values * (race.max_coord - race.min_coord) + race.min_coord
+            Wextra = np.identity(dim)[coords, :]
+            Bextra = coord_values
+            W = np.concatenate([W, Wextra], axis=0)
+            B = np.concatenate([B, Bextra], axis=0)
+    
+        point = np.linalg.solve(W, width*target_values - B)
+        ds.append(point)
+        labels.append(label)
+        #Weq,Beq = race.get_hf_equations(np.array(hash_values), rep, len(hash_values))
+        #polytope = Polytope(A=Weq, b=Beq)
+        #assert(polytope.check_inside(point))
+    D = np.stack(ds, axis=0)
+    L = np.array(labels)
+    return D, L
 
-    # extra equations if required
-    if W.shape[1] > W.shape[0]:
-        p = W.shape[0]
-        dim = W.shape[1]
-        extra = dim - p
-        coords = np.random.randint(0, dim, size=extra)
-        coord_values = np.random.uniform(size=extra)
-        coord_values = coord_values * (race.max_coord - race.min_coord) + race.min_coord
-        Wextra = np.identity(dim)[coords, :]
-        Bextra = coord_values
-        W = np.concatenate([W, Wextra], axis=0)
-        B = np.concatenate([B, Bextra], axis=0)
+def sample_classrep(rep, label, num):
+    race = global_vars["race"]
+    sketch = race.sketch_memory[label][rep] # Ace
+    topk_df = sketch.get_top_buckets()
+    values = topk_df["value"].values
+    hashcols = [a for a in topk_df.columns if a.startswith("C")]
+    bucket_counts = values/np.sum(values) * num
+    ds = []
+    labels = []
+    for bucket_idx in range(len(bucket_counts)):
+        count = np.floor(bucket_counts[bucket_idx])
+        frac = bucket_counts[bucket_idx]  - count
+        count = count + np.random.binomial(1, frac)
+        count = int(count)
+        if count == 0:
+            continue
+        hash_values = topk_df[hashcols].loc[bucket_idx, :].values
+        d = sample_m1(rep, label, hash_values, count) # d = ([x1, x2, ..], [l1, l2, ..])
+        ds.append(d[0])
+        labels.append(d[1])
 
-    point = np.linalg.solve(W, width*target_values - B)
-    #Weq,Beq = race.get_hf_equations(np.array(hash_values), rep, len(hash_values))
-    #polytope = Polytope(A=Weq, b=Beq)
-    #assert(polytope.check_inside(point))
-      
-    return point,label
+    # randomize
+    D = np.concatenate(ds, axis=0)
+    L = np.concatenate(labels)
 
-def sample_batch(num, kde_lb):
+    idx = np.arange(D.shape[0])
+    np.random.shuffle(idx)
+    D = D[idx]
+    L = L[idx] # useless
+    return D, L
+
+def sample_batch(num):
     race = global_vars["race"]
     norm_info = False
     if "store_norms" in race.params:
         norm_info = race.params["store_norms"]
     class_counts = global_vars["class_prob"] * num
     class_counts = class_counts.astype(int) + 1
-    class_prob = global_vars["class_prob"]
     num_samples = 0
-    Datas = []
-    Labels = []
-    num_failed = 0
+    ds = []
+    labels = []
 
-    while np.sum(class_counts) > 0 and num_samples < num:
-        print("Samples", num_samples, "/", num)
-        print(class_counts)
-        print(class_prob)
-        data = []
-        labels = []
-        with concurrent.futures.ProcessPoolExecutor(40) as executor:
-            futures = []
-            print("submitting jobs")
-            this_num = min((num-num_samples)*10, num)
-    
-            for i in tqdm(range(this_num)):
-                label = np.argmax(np.random.multinomial(1, class_prob, size=None))
-                rep = np.random.randint(0, race.repetitions)
-                sketch = race.sketch_memory[label][rep] # Ace
-                topk_df = sketch.get_top_buckets()
-                values = topk_df["value"].values
-                bucket_idx = np.argmax(np.random.multinomial(1, values/np.sum(values), size=None))
-                hashcols = [a for a in topk_df.columns if a.startswith("C")]
-                hash_values = topk_df[hashcols].loc[bucket_idx, :].values
-                norm = None
-                if norm_info:
-                    norm_sums = topk_df["norm_sum"].values
-                    norm = norm_sums[bucket_idx] / values[bucket_idx]
-                #sample_m1(rep, label, hash_values, norm)
-                futures.append(executor.submit(sample_m1, rep, label, hash_values))
-            print("waiting for executions")
-            for res in tqdm(concurrent.futures.as_completed(futures), total=this_num):
-              d = res.result()
-              if d is not None:
-                  data.append(d[0])
-                  labels.append(d[1])
-              else:
-                  num_failed += 1
-        data =  np.array(data)
-        labels = np.array(labels)
-        if kde_lb is not None:
-          kde_estimates = race.query(data, labels)
-          data = data[kde_estimates > kde_lb]
-          labels = labels[kde_estimates > kde_lb]
-        num_samples += len(labels)
-        # update class prob
-        ls, cts = np.unique(labels, return_counts=True)
-        for li in range(len(ls)):
-          class_counts[ls[li]] = max(0, class_counts[ls[li]] - cts[li])
-        class_prob = class_counts / np.sum(class_counts)
+    pll_num = 0
+    with concurrent.futures.ProcessPoolExecutor(40) as executor:
+
+        futures = []
+        for this_class in range(len(class_counts)):
+            this_class_count = class_counts[this_class]
+            for rep in range(race.repetitions):
+                this_class_rep_count = (this_class_count // race.repetitions) + 1
+                #d = sample_classrep(rep, this_class, this_class_rep_count)
+                #pdb.set_trace()
+                futures.append(executor.submit(sample_classrep, rep, this_class, this_class_rep_count))
+                pll_num += 1
             
-        Datas.append(data)
-        Labels.append(labels)
-    Data = np.concatenate(Datas, axis=0)
-    Label = np.concatenate(Labels, axis=0)
-    print("Num sampled", Data.shape[0], "num failed", num_failed)
-    return Data, Label
+        print("waiting for executions")
+
+        for res in tqdm(concurrent.futures.as_completed(futures), total=pll_num):
+              d = res.result()
+              ds.append(d[0])
+              labels.append(d[1])
+
+    # randomize order
+    D = np.concatenate(ds, axis=0)
+    L = np.concatenate(labels)
+
+    idx = np.arange(D.shape[0])
+    np.random.shuffle(idx)
+    D = D[idx]
+    L = L[idx] # useless
+    return D, L
         
 
 
@@ -155,7 +168,7 @@ class RaceSamplePPD(data.Dataset):
 
     def __getitem__(self, index):
         if self.Data is None or index + 1 > self.Data.shape[0]:
-            data,labels = sample_batch(self.parallel_batch, self.kde_lb)
+            data,labels = sample_batch(self.parallel_batch)
             if self.Data is None:
                 self.Data = data
                 self.labels = labels

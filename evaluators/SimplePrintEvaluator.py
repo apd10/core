@@ -13,6 +13,9 @@ class SimplePrintEvaluator:
       self.skip_0 = False
       if "skip_0" in params:
           self.skip_0  = params["skip_0"]
+      self.csv_dump = None
+      if "csv_dump" in params:
+          self.csv_dump = params["csv_dump"]
 
     def evaluate(self, epoch, loc_itr, iteration, model, loss_func): # also logs
         if self.skip_0 :
@@ -42,3 +45,10 @@ class SimplePrintEvaluator:
         valid_loss = total_loss / data.len()
         acc = correct / data.len()
         print('{} : Epoch : {} Loc_itr: {} Iteration: {} Loss: {} Accuracy: {}'.format(key, epoch, loc_itr, iteration, valid_loss, acc))
+        if self.csv_dump is not None:
+            f = open(self.csv_dump, "a")
+            if iteration == 0:
+                f.write('{},{},{},{},{},{}\n'.format("key", "epoch", "loc_itr", "iteration", "loss", "acc"))
+            f.write('{},{},{},{},{},{}\n'.format(key, epoch, loc_itr, iteration, valid_loss, acc))
+            f.close()
+            

@@ -61,4 +61,4 @@ class Stats:
 
         mean = np.array(mean.cpu())
         std = np.array(std.cpu())
-        np.savez_compressed(self.stat_file, mean=mean, std=std)
+        np.savez_compressed(self.stat_file, mu=mean, std=std)

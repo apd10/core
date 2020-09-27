@@ -1,59 +1,33 @@
 module: "Loop"
-device_id: 2
-epochs: 1
+device_id: 0
+epochs: 21
 train_data:
-  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist8m//train.txt"
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/DATASET/train.txt"
   dataset: "gensvm"
   gensvm:
     dimension: 784
     base_idx: 1
+    centering_info: "/home/apd10/experiments/projects/summary_based_learning/DATA/DATASET/centering_info.npz"
   sampler: "simple"
   simple:
-    batch_size: 512
-test_data:
-  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist8m//test.txt"
-  dataset: "gensvm"
-  gensvm:
-    dimension: 784
-    base_idx: 1
-  sampler: "simple"
-  simple:
-    batch_size: 1000
-validation_data:
-  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist8m//test_small.txt"
-  dataset: "gensvm"
-  gensvm:
-    dimension: 784
-    base_idx: 1
-  sampler: "simple"
-  simple:
-    batch_size: 1000
-progress_train_data:
-  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist8m//train_small.txt"
-  dataset: "gensvm"
-  gensvm:
-    dimension: 784
-    base_idx: 1
-  sampler: "simple"
-  simple:
-    batch_size: 1000
+    batch_size: 256
 progress_test_data:
-  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist8m//test_small.txt"
+  file: "/home/apd10/experiments/projects/summary_based_learning/DATA/mnist8m/test.txt"
   dataset: "gensvm"
   gensvm:
     dimension: 784
     base_idx: 1
-
+    centering_info: "/home/apd10/experiments/projects/summary_based_learning/DATA/DATASET/centering_info.npz"
   sampler: "simple"
   simple:
     batch_size: 1000
 model:
   name: "MLP"
   MLP:
-    input_dim: 784
+    input_dim: DIM
     num_layers: 3
-    hidden_size: 100
-    num_class: 10
+    hidden_size: DIM
+    num_class: NUM_CLASSES
 optimizer:
   name: "adam"
   adam:
@@ -64,5 +38,6 @@ loss:
 progress_evaluator:
   name: "simple_print"
   simple_print:
-      eval_itr: 1000000
-      eval_epoch: 1
+      eval_itr: 500000000
+      eval_epoch: 5
+      csv_dump: "/home/apd10/experiments/projects/summary_based_learning/DATA/DATASET/record/log.train.csv"
